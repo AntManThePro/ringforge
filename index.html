@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="RINGFORGE"/>
+<meta name="description" content="RINGFORGE NEXUS — Ring capability truth layer. DoubleA @ AntManThePro"/>
+<title>RINGFORGE // NEXUS v3 — DoubleA · AntManThePro</title>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="icon" type="image/svg+xml" href="icons/nexus-sigil.svg"/>
+<link rel="icon" href="icons/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/favicon-192.png"/>
+<link rel="icon" type="image/png" sizes="512x512" href="icons/favicon-512.png"/>
+<link rel="apple-touch-icon" href="icons/nexus-ringforge-180.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --g:#00ff87;--c:#60efff;--p:#ff0080;--y:#ffcc00;--void:#0a0a0f;
+  --panel:#0d1110;--ink:#d8ffe8;--muted:rgba(216,255,232,.55);
+  --dock:64px;--status:52px;--safe-b:env(safe-area-inset-bottom,0px);
+  --font-mono:"IBM Plex Mono",ui-monospace,"Cascadia Code","SF Mono",Menlo,Consolas,monospace;
+  --font-display:"Space Grotesk","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--void);color:var(--ink)}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font-mono);font-size:12.5px;line-height:1.45;overflow:hidden;cursor:crosshair}
+button,input,select,textarea{font-family:inherit;color:inherit}
+.display{font-family:var(--font-display);letter-spacing:.04em}
+#grain,#scanlines,#vignette{position:fixed;inset:0;pointer-events:none;z-index:90}
+#grain{opacity:.09;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");mix-blend-mode:overlay}
+#scanlines{background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.18) 3px);mix-blend-mode:multiply;opacity:.35;z-index:91}
+#vignette{background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.55) 100%);z-index:2}
+.boot{position:fixed;inset:0;z-index:100;background:#050508;display:flex;flex-direction:column;justify-content:center;padding:6vh 7vw;gap:16px}
+.boot-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.boot-mark{width:72px;height:72px;filter:drop-shadow(0 0 16px rgba(0,255,135,.45));animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.boot-word h1{margin:0;font-family:var(--font-display);font-size:28px;color:var(--g);text-shadow:0 0 16px rgba(0,255,135,.45);letter-spacing:.12em}
+.boot-word p{margin:2px 0 0;color:var(--c);letter-spacing:.18em;font-size:11px}
+.boot-word .op{color:var(--p);letter-spacing:.14em;font-size:11px;margin-top:4px}
+.boot-log{margin:0;max-width:760px;color:var(--g);text-shadow:0 0 8px rgba(0,255,135,.35);font-size:12px;white-space:pre-wrap;min-height:210px}
+.boot-log .dim{color:var(--c);opacity:.85}.boot-log .hot{color:var(--p)}.boot-log .y{color:var(--y)}
+.boot-skip{color:var(--muted);font-size:11px;letter-spacing:.18em;animation:blink 1.2s step-end infinite}
+@keyframes blink{50%{opacity:.25}}
+.kernel{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
+  padding:6px 12px;min-height:var(--status);
+  background:linear-gradient(to bottom,rgba(10,10,15,.94),rgba(10,10,15,.42) 85%,transparent);
+  border-bottom:1px solid rgba(0,255,135,.14);backdrop-filter:blur(8px);font-size:10.5px}
+.nexus-stamp{display:flex;align-items:center;gap:10px;margin-right:6px}
+.nexus-stamp h1{margin:0;font-family:var(--font-display);font-size:15px;color:var(--g);letter-spacing:.14em;text-shadow:0 0 10px rgba(0,255,135,.5);line-height:1}
+.nexus-stamp p{margin:0;font-size:8.5px;letter-spacing:.16em;color:var(--c)}
+.nexus-chip{border:1px solid rgba(255,0,128,.4);color:var(--p);padding:1px 6px;font-size:9px;letter-spacing:.1em;white-space:nowrap}
+.kernel .chip{border:1px solid rgba(96,239,255,.28);padding:2px 7px;color:var(--c);letter-spacing:.08em;white-space:nowrap}
+.kernel .chip.warn{border-color:rgba(255,204,0,.4);color:var(--y)}
+.kernel .chip.bad{border-color:rgba(255,0,128,.45);color:var(--p)}
+.kernel .chip.ok{border-color:rgba(0,255,135,.4);color:var(--g)}
+.app{position:fixed;inset:0;padding:calc(var(--status) + 8px) 12px calc(var(--dock) + 14px + var(--safe-b));z-index:5;display:flex;flex-direction:column;gap:10px;opacity:0;pointer-events:none;transition:opacity .35s}
+.app.on{opacity:1;pointer-events:auto}
+.panel{display:none;flex:1;min-height:220px;flex-direction:column;gap:10px;overflow:auto}
+.panel.active{display:flex}
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.panel-head h2{margin:0;font-family:var(--font-display);font-size:18px;color:var(--g);text-shadow:0 0 12px rgba(0,255,135,.35)}
+.panel-head .sub{color:var(--muted);font-size:11px;letter-spacing:.12em}
+.truth{display:inline-flex;align-items:center;gap:6px;font-size:9.5px;letter-spacing:.1em;border:1px solid rgba(96,239,255,.25);padding:2px 6px;color:var(--c)}
+.truth.fact{border-color:rgba(0,255,135,.4);color:var(--g)}
+.truth.derived{border-color:rgba(255,204,0,.4);color:var(--y)}
+.truth.mock{border-color:rgba(255,0,128,.4);color:var(--p)}
+.truth.ai{border-color:rgba(96,239,255,.5);color:var(--c)}
+.truth.unavail{border-color:rgba(255,255,255,.2);color:var(--muted)}
+.card{background:rgba(13,17,16,.78);border:1px solid rgba(0,255,135,.16);border-radius:2px;padding:12px;backdrop-filter:blur(6px);overflow:auto}
+.split{display:grid;grid-template-columns:1fr;gap:10px;flex:1;min-height:240px}
+@media(min-width:900px){.split-2{grid-template-columns:1.2fr .8fr}.split-topo{grid-template-columns:1fr 340px}.split-bus{grid-template-columns:1fr 1fr}.split-kern{grid-template-columns:1.1fr .9fr}}
+#topo-canvas,#radar-canvas{width:100%;height:100%;min-height:240px;display:block;background:radial-gradient(ellipse at 50% 40%,#0b1412 0%,#0a0a0f 70%);touch-action:none;border:1px solid rgba(0,255,135,.18)}
+.topo-wrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+.topo-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--muted);padding:4px 0}
+.topo-legend span{display:inline-flex;align-items:center;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.inspector{overflow:auto;max-height:100%}
+.inspector h3{margin:0 0 8px;font-family:var(--font-display);color:var(--c);font-size:15px}
+.inspector .kv{display:grid;grid-template-columns:110px 1fr;gap:4px 8px;font-size:11px;margin-bottom:10px}
+.inspector .kv b{color:var(--muted);font-weight:500}
+.taglist{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.tag{font-size:10px;padding:2px 7px;border:1px solid rgba(96,239,255,.3);color:var(--c)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters input,.filters select,textarea.kern{background:#0a0e0d;border:1px solid rgba(0,255,135,.25);padding:7px 10px;min-height:36px;color:var(--ink);outline:none}
+.filters input:focus,.filters select:focus,textarea.kern:focus{border-color:var(--c);box-shadow:0 0 0 1px rgba(96,239,255,.25)}
+.filters input{flex:1;min-width:140px}
+textarea.kern{width:100%;min-height:220px;resize:vertical;line-height:1.5;font-size:11.5px;color:var(--g)}
+.matrix-table{width:100%;border-collapse:collapse;font-size:11px}
+.matrix-table th{text-align:left;padding:8px 6px;color:var(--c);border-bottom:1px solid rgba(96,239,255,.25);position:sticky;top:0;background:#0d1110;z-index:1;letter-spacing:.08em;font-weight:500}
+.matrix-table td{padding:8px 6px;border-bottom:1px solid rgba(0,255,135,.08);vertical-align:top;cursor:pointer}
+.matrix-table tr:hover td{background:rgba(0,255,135,.05)}
+.matrix-table tr.sel td{background:rgba(96,239,255,.08)}
+.status-chip{display:inline-block;padding:2px 6px;font-size:9.5px;letter-spacing:.06em;border:1px solid}
+.status-chip.AVAILABLE{color:var(--g);border-color:rgba(0,255,135,.45)}
+.status-chip.EARLY_ACCESS,.status-chip.EARLY\ ACCESS{color:var(--c);border-color:rgba(96,239,255,.45)}
+.status-chip.RESTRICTED{color:var(--y);border-color:rgba(255,204,0,.45)}
+.status-chip.LIMITED{color:var(--y);border-color:rgba(255,204,0,.35)}
+.status-chip.UNAVAILABLE{color:var(--p);border-color:rgba(255,0,128,.45)}
+.rw{display:inline-flex;gap:3px}
+.rw i{font-style:normal;font-size:9px;padding:1px 4px;border:1px solid rgba(255,255,255,.15);color:var(--muted)}
+.rw i.on{color:var(--g);border-color:rgba(0,255,135,.4)}
+.bus-layout{display:grid;grid-template-columns:1fr;gap:10px;flex:1;min-height:240px}
+@media(min-width:900px){.bus-layout{grid-template-columns:1.05fr .95fr}}
+.event-stream{overflow:auto;flex:1;min-height:140px;font-size:11px}
+.evt{border-left:2px solid var(--p);padding:6px 8px;margin-bottom:6px;background:rgba(255,0,128,.04)}
+.evt .meta{color:var(--muted);font-size:10px}
+.evt .type{color:var(--p);font-weight:600}
+.incident{border:1px solid rgba(255,204,0,.35);padding:8px;margin-bottom:8px;background:rgba(255,204,0,.04)}
+.incident h4{margin:0 0 4px;color:var(--y);font-size:12px;font-family:var(--font-display)}
+.scope-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:800px){.scope-grid{grid-template-columns:1fr 1fr}}
+.scope-card{border:1px solid rgba(0,255,135,.18);padding:12px;background:rgba(0,255,135,.03)}
+.scope-card h3{margin:0 0 6px;font-family:var(--font-display);color:var(--g);font-size:14px}
+.conflict{border:1px solid rgba(255,0,128,.5);padding:12px;background:rgba(255,0,128,.06);margin-top:10px}
+.conflict h3{margin:0 0 6px;color:var(--p);font-family:var(--font-display)}
+.hire{display:grid;grid-template-columns:1fr;gap:10px;flex:1;min-height:240px;overflow:auto}
+@media(min-width:700px){.hire{grid-template-columns:repeat(2,1fr)}.hire .hero{grid-column:1/-1}}
+.stat{border:1px solid rgba(0,255,135,.2);padding:14px;background:rgba(0,255,135,.03)}
+.stat .n{font-family:var(--font-display);font-size:32px;color:var(--g);text-shadow:0 0 14px rgba(0,255,135,.35)}
+.stat .l{color:var(--muted);font-size:11px;letter-spacing:.14em;margin-top:4px}
+.hero{border:1px solid rgba(96,239,255,.3);padding:18px;background:linear-gradient(135deg,rgba(0,255,135,.06),rgba(96,239,255,.05))}
+.hero .quote{font-family:var(--font-display);font-size:22px;color:var(--ink);margin:0 0 10px}
+.hero .credit{color:var(--c);letter-spacing:.12em;font-size:11px}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:50;height:calc(var(--dock) + var(--safe-b));padding:6px 6px var(--safe-b);
+  display:flex;gap:3px;justify-content:space-around;align-items:stretch;
+  background:linear-gradient(to top,rgba(10,10,15,.96),rgba(10,10,15,.55));
+  border-top:1px solid rgba(0,255,135,.16);backdrop-filter:blur(10px)}
+.dock button{flex:1;max-width:110px;background:transparent;border:1px solid transparent;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 1px;min-height:48px;font-size:9px;letter-spacing:.08em;cursor:pointer}
+.dock button.on{color:var(--g);border-color:rgba(0,255,135,.35);box-shadow:0 0 12px rgba(0,255,135,.12) inset}
+.dock button .ico{font-size:13px;line-height:1}
+.search-overlay,.modal{position:fixed;inset:0;z-index:80;background:rgba(10,10,15,.82);display:none;align-items:flex-start;justify-content:center;padding:12vh 16px}
+.search-overlay.on,.modal.on{display:flex}
+.modal{align-items:center;z-index:75}
+.search-box,.modal-card{width:min(640px,100%);background:#0d1110;border:1px solid rgba(0,255,135,.35);padding:12px;box-shadow:0 0 40px rgba(0,255,135,.12)}
+.modal-card{max-height:80vh;overflow:auto;border-color:rgba(96,239,255,.35);padding:16px}
+.search-box input{width:100%;background:transparent;border:none;outline:none;color:var(--g);font-size:16px;padding:8px 0}
+.search-hits{max-height:40vh;overflow:auto;margin-top:8px}
+.search-hits div{padding:8px;border-top:1px solid rgba(0,255,135,.1);cursor:pointer}
+.search-hits div:hover{background:rgba(0,255,135,.06)}
+.modal-card pre{white-space:pre-wrap;word-break:break-word;font-size:11px;color:var(--ink);margin:0}
+.btn{background:transparent;border:1px solid rgba(0,255,135,.35);color:var(--g);padding:8px 12px;min-height:36px;cursor:pointer;letter-spacing:.1em;font-size:11px}
+.btn:hover{background:rgba(0,255,135,.08)}
+.btn.pink{border-color:rgba(255,0,128,.45);color:var(--p)}
+.btn.cyan{border-color:rgba(96,239,255,.45);color:var(--c)}
+.help{color:var(--muted);font-size:10px}
+ul.tight{margin:6px 0;padding-left:18px}
+ul.tight li{margin:3px 0}
+.empty{color:var(--muted);padding:20px;text-align:center}
+code{color:var(--c)}
+.kern-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.kern-err{color:var(--p);font-size:11px;min-height:16px}
+.gate-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:900px){.gate-grid{grid-template-columns:1.05fr .95fr}}
+#gate-sidecar,#gate-token,#hmac-secret,#hmac-sig{width:100%;background:#0a0e0d;border:1px solid rgba(0,255,135,.25);padding:7px 10px;min-height:36px;color:var(--ink);outline:none;margin:4px 0 8px}
+#gate-sidecar:focus,#gate-token:focus,#hmac-secret:focus,#hmac-sig:focus{border-color:var(--c)}
+.gate-row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid rgba(0,255,135,.08);font-size:11px}
+.kernel .chip.live{border-color:rgba(0,255,135,.7);color:var(--g);box-shadow:0 0 10px rgba(0,255,135,.15)}
+
+</style>
+</head>
+<body>
+<div id="grain"></div><div id="scanlines"></div><div id="vignette"></div>
+
+<section class="boot" id="boot">
+  <div class="boot-row">
+    <svg class="boot-mark" width="72" height="72" viewBox="0 0 64 64" aria-label="NEXUS sigil">
+      <rect width="64" height="64" rx="14" fill="#0a0a0f" stroke="#00ff87" stroke-width="1.5"/>
+      <circle cx="32" cy="32" r="19" fill="none" stroke="#60efff" stroke-width="1.2"/>
+      <path d="M20 42 L32 14 L44 42 M25.5 32 H38.5" fill="none" stroke="#00ff87" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="32" cy="32" r="3.2" fill="#ff0080"/>
+    </svg>
+    <div class="boot-word">
+      <h1>NEXUS</h1>
+      <p>NExtended Xperimental USers</p>
+      <div class="op">DoubleA · AntManThePro</div>
+    </div>
+  </div>
+  <pre class="boot-log" id="boot-log"></pre>
+  <div class="boot-skip">SPACE / TAP — ENTER MISSION CONTROL</div>
+</section>
+
+<header class="kernel" id="kernel" hidden>
+  <div class="nexus-stamp" data-brand="NExtended Xperimental USers">
+    <svg width="36" height="36" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="14" fill="#0a0a0f" stroke="#00ff87" stroke-width="1.5"/>
+      <circle cx="32" cy="32" r="19" fill="none" stroke="#60efff" stroke-width="1.2"/>
+      <path d="M20 42 L32 14 L44 42 M25.5 32 H38.5" fill="none" stroke="#00ff87" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="32" cy="32" r="3.2" fill="#ff0080"/>
+    </svg>
+    <div>
+      <h1>NEXUS</h1>
+      <p>NExtended Xperimental USers</p>
+    </div>
+  </div>
+  <span class="nexus-chip">DoubleA · AntManThePro</span>
+  <span class="chip ok">RINGFORGE v3</span>
+  <span class="chip">MATRIX v1 · VERIFIED 2026-09-10 CT</span>
+  <span class="chip">NEXT 2026-10-01 09:00 CT</span>
+  <span class="chip warn">PARTNER OAUTH: NOT LINKED</span>
+  <span class="chip bad" id="src-chip">RUNTIME SOURCE FACTS: UNAVAILABLE</span>
+  <span class="chip" id="clock"></span>
+</header>
+
+<main class="app" id="app">
+  <section class="panel active" data-panel="1" id="panel-1">
+    <div class="panel-head">
+      <div>
+        <h2>01 · PROPERTY TOPOLOGY</h2>
+        <div class="sub">FORCE GRAPH · DEVICE FAMILIES FROM DEVICE REGISTRY v1</div>
+      </div>
+      <span class="truth fact">RING DOCUMENTATION FACT</span>
+    </div>
+    <div class="topo-legend" id="topo-legend"></div>
+    <div class="split split-topo">
+      <div class="topo-wrap card" style="padding:0;overflow:hidden">
+        <canvas id="topo-canvas"></canvas>
+      </div>
+      <aside class="card inspector" id="topo-inspector">
+        <h3>Select a family node</h3>
+        <p class="help">Family-level IDs only — no invented device models. Drag · pinch-zoom · click for verified capabilities.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="2" id="panel-2">
+    <div class="panel-head">
+      <div>
+        <h2>02 · CAPABILITY MATRIX</h2>
+        <div class="sub">SEARCHABLE · FILTERABLE · SOURCE + LAST_VERIFIED</div>
+      </div>
+      <span class="truth fact">RING DOCUMENTATION FACT</span>
+    </div>
+    <div class="filters">
+      <input id="mx-q" type="search" placeholder="Search capability / scope / endpoint…" aria-label="Search matrix"/>
+      <select id="mx-status"><option value="">ALL STATUS</option></select>
+      <select id="mx-scope"><option value="">ALL SCOPE FAMILY</option></select>
+      <select id="mx-flags">
+        <option value="">ALL FLAGS</option>
+        <option value="read">READ</option>
+        <option value="write">WRITE</option>
+        <option value="event">EVENT</option>
+        <option value="webhook">WEBHOOK</option>
+      </select>
+      <span class="help" id="mx-count"></span>
+    </div>
+    <div class="split split-2" style="flex:1;min-height:0">
+      <div class="card" style="padding:0;overflow:auto">
+        <table class="matrix-table" id="mx-table">
+          <thead><tr><th>CAPABILITY</th><th>STATUS</th><th>SCOPE</th><th>R/W/E/H</th><th>SOURCE</th><th>VERIFIED</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <aside class="card inspector" id="mx-inspector"><h3>Contract record</h3><p class="help">Click a row.</p></aside>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="3" id="panel-3">
+    <div class="panel-head">
+      <div>
+        <h2>03 · EVENT BUS + RADAR</h2>
+        <div class="sub">DOCUMENTED WEBHOOKS ONLY · TEMPORAL CLUSTERING + GRAPH DISTANCE</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span class="truth mock">MOCK ADAPTER</span>
+        <button class="btn pink" id="bus-pause">SPACE · PAUSE</button>
+      </div>
+    </div>
+    <div class="card" style="padding:10px">
+      <div class="help">Correlation default <span class="truth derived">RINGFORGE DERIVED</span>: events within <code>Δt ≤ 90s</code> AND same <code>location_id</code> OR family graph distance ≤ 1 → <b>LIKELY RELATED</b> (never certain). Override the scorer in panel 06 KERNEL.</div>
+    </div>
+    <div class="split split-bus" style="flex:1;min-height:0">
+      <div class="topo-wrap card" style="padding:0;overflow:hidden;min-height:200px">
+        <canvas id="radar-canvas"></canvas>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;min-height:0">
+        <div class="panel-head" style="margin-bottom:6px"><span class="sub">STREAM</span><span class="help" id="bus-stats"></span></div>
+        <div class="event-stream" id="event-stream"></div>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;max-height:28vh">
+      <div class="panel-head" style="margin-bottom:6px"><span class="sub">INCIDENTS · LIKELY RELATED</span></div>
+      <div class="event-stream" id="incident-stream"></div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="4" id="panel-4">
+    <div class="panel-head">
+      <div>
+        <h2>04 · SCOPE / OAUTH</h2>
+        <div class="sub">CANONICAL SCOPE REGISTRY v1</div>
+      </div>
+      <span class="truth fact">RING DOCUMENTATION FACT</span>
+    </div>
+    <div class="card" style="overflow:auto;flex:1">
+      <div class="scope-grid" id="scope-grid"></div>
+      <div class="conflict" id="conflict-box"></div>
+      <div style="margin-top:12px" id="oauth-box"></div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="5" id="panel-5">
+    <div class="panel-head">
+      <div>
+        <h2>05 · ENDPOINT REGISTRY</h2>
+        <div class="sub">AMAZON VISION API · OAUTH · WEBHOOKS</div>
+      </div>
+      <span class="truth fact">RING DOCUMENTATION FACT</span>
+    </div>
+    <div class="filters">
+      <input id="ep-q" type="search" placeholder="Filter endpoints…" aria-label="Filter endpoints"/>
+      <select id="ep-cat"><option value="">ALL CATEGORIES</option></select>
+    </div>
+    <div class="card" style="overflow:auto;flex:1" id="ep-list"></div>
+  </section>
+
+  <section class="panel" data-panel="6" id="panel-6">
+    <div class="panel-head">
+      <div>
+        <h2>06 · CORRELATOR KERNEL</h2>
+        <div class="sub">HOT-RELOAD JS · AFFECTS LIVE INCIDENT CLUSTERING</div>
+      </div>
+      <span class="truth derived">RINGFORGE DERIVED</span>
+    </div>
+    <div class="split split-kern" style="flex:1;min-height:0">
+      <div class="card">
+        <div class="help">Pure function. Return a number. Lower = better match. Return <code>Infinity</code> to reject. Sandboxed via <code>new Function</code>. Events remain MOCK.</div>
+        <textarea class="kern" id="kern-src" spellcheck="false"></textarea>
+        <div class="kern-meta">
+          <button class="btn" id="kern-reload">HOT RELOAD</button>
+          <button class="btn cyan" id="kern-reset">RESET DEFAULT</button>
+          <span class="help" id="kern-status">factory scorer loaded</span>
+        </div>
+        <div class="kern-err" id="kern-err"></div>
+      </div>
+      <div class="card inspector">
+        <h3>Kernel contract</h3>
+        <pre style="font-size:11px;color:var(--c)">{
+  ev,          // incoming mock event
+  last,        // last event on candidate incident
+  familyDist,  // BFS distance on family graph
+  dtMs,        // ev.ts - last.ts
+  WINDOW_MS    // 90000
+}
+return Number  // score; Infinity = skip</pre>
+        <p class="help">Default rule: same location OR dist ≤ 1, and dt ≤ 90s. Score = (sameLoc?0:2) + dist + dt/WINDOW.</p>
+        <p class="help">This panel is the interview piece: live code changes clustering behavior without pretending the bus is a live Ring tenant.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="7" id="panel-7">
+    <div class="panel-head">
+      <div>
+        <h2>07 · TRUTH HUD // HIRE</h2>
+        <div class="sub">RECRUITER READOUT · NEVER SACRIFICE TRUTH FOR FEATURES</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn cyan" id="btn-export">E · EXPORT PAYLOAD</button>
+      </div>
+    </div>
+    <div class="hire" id="hire"></div>
+  </section>
+</main>
+
+<nav class="dock" id="dock" hidden>
+  <button data-go="1" class="on"><span class="ico">◈</span>TOPO</button>
+  <button data-go="2"><span class="ico">▦</span>MATRIX</button>
+  <button data-go="3"><span class="ico">⚡</span>BUS</button>
+  <button data-go="4"><span class="ico">⬡</span>SCOPE</button>
+  <button data-go="5"><span class="ico">⇄</span>API</button>
+  <button data-go="6"><span class="ico">λ</span>KERNEL</button>
+  <button data-go="7"><span class="ico">◎</span>TRUTH</button>
+  <button data-go="8"><span class="ico">⚿</span>GATE</button>
+</nav>
+
+  <section class="panel" data-panel="8" id="panel-8">
+    <div class="panel-head">
+      <div>
+        <h2>08 · SOURCE FACT GATE</h2>
+        <div class="sub">ADAPTER BOUNDARY · DIRECT BLOCKED BY CORS · SIDECAR IS THE PIPE</div>
+      </div>
+      <span class="truth unavail" id="gate-truth">RING SOURCE FACT (runtime) — UNAVAILABLE</span>
+    </div>
+    <div class="gate-grid">
+      <div class="card">
+        <h3 class="display" style="color:var(--c);margin:0 0 8px">Link state</h3>
+        <div class="taglist" id="gate-chips"></div>
+        <div class="kv" style="margin-top:10px">
+          <b>mode</b><span id="gate-mode-label">MOCK</span>
+          <b>last probe</b><span id="gate-last">never</span>
+          <b>http</b><span id="gate-http">—</span>
+          <b>devices</b><span id="gate-devcount">0 · source empty</span>
+        </div>
+        <div class="filters" style="margin-top:12px">
+          <select id="gate-mode">
+            <option value="MOCK">MOCK ADAPTER</option>
+            <option value="DIRECT">DIRECT api.amazonvision.com</option>
+            <option value="SIDECAR">SIDECAR 127.0.0.1</option>
+          </select>
+        </div>
+        <label class="help" for="gate-sidecar">Sidecar base</label>
+        <input id="gate-sidecar" value="http://127.0.0.1:8787" spellcheck="false"/>
+        <label class="help" for="gate-token">Bearer token (session only · never exported)</label>
+        <input id="gate-token" type="password" autocomplete="off" placeholder="paste access token — not stored to disk unless you check persist"/>
+        <label class="help" style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <input type="checkbox" id="gate-persist"/> persist token in sessionStorage (this origin only)
+        </label>
+        <div class="kern-meta">
+          <button class="btn" id="gate-probe">PROBE SOURCE</button>
+          <button class="btn pink" id="gate-clear">CLEAR LINK</button>
+          <button class="btn cyan" id="gate-health">SIDECAR /health</button>
+        </div>
+        <p class="help">DIRECT mode is supposed to fail in a browser. Partner docs: server-to-server only, CORS blocked. A 200 here would be a SOURCE FACT. A CORS TypeError is a TRANSPORT FACT, not a fake outage.</p>
+      </div>
+      <div class="card">
+        <h3 class="display" style="color:var(--c);margin:0 0 8px">Probe log</h3>
+        <div class="event-stream" id="gate-log"></div>
+      </div>
+    </div>
+    <div class="split split-2" style="flex:1;min-height:0">
+      <div class="card" style="overflow:auto">
+        <h3 class="display" style="color:var(--g);margin:0 0 8px">Source inventory</h3>
+        <p class="help">Filled only from a successful source response. Family inference uses documented identification rules — never from image URLs.</p>
+        <div id="gate-inv" class="empty">NO SOURCE FACTS</div>
+      </div>
+      <div class="card">
+        <h3 class="display" style="color:var(--y);margin:0 0 8px">Crypto lab · real WebCrypto</h3>
+        <p class="help">PKCE S256 as documented for partner-initiated OAuth. HMAC-SHA256 as documented for <code>X-Signature</code>.</p>
+        <div class="kern-meta">
+          <button class="btn" id="pkce-gen">GENERATE PKCE</button>
+        </div>
+        <pre id="pkce-out" style="font-size:11px;color:var(--c);white-space:pre-wrap">hit GENERATE</pre>
+        <label class="help" for="hmac-secret">webhook secret</label>
+        <input id="hmac-secret" type="password" placeholder="signing secret"/>
+        <label class="help" for="hmac-body">raw POST body</label>
+        <textarea class="kern" id="hmac-body" style="min-height:90px">{ "data": { "type": "motion_detected" }, "meta": { "request_id": "demo" } }</textarea>
+        <label class="help" for="hmac-sig">X-Signature header</label>
+        <input id="hmac-sig" placeholder="sha256=… or paste computed"/>
+        <div class="kern-meta">
+          <button class="btn cyan" id="hmac-run">SIGN + VERIFY</button>
+          <span class="help" id="hmac-status">idle</span>
+        </div>
+        <pre id="hmac-out" style="font-size:11px;color:var(--ink);white-space:pre-wrap"></pre>
+      </div>
+    </div>
+  </section>
+
+<div class="search-overlay" id="search">
+  <div class="search-box">
+    <div class="help">/ SEARCH · ESC CLOSE</div>
+    <input id="search-input" placeholder="capability, webhook, scope, endpoint…" autocomplete="off"/>
+    <div class="search-hits" id="search-hits"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="panel-head"><h3 id="modal-title" class="display" style="margin:0;color:var(--c)">Record</h3><button class="btn" id="modal-close">ESC</button></div>
+    <pre id="modal-body"></pre>
+  </div>
+</div>
+
+<script id="RF_DATA" type="application/json">{"version":"3.0.0","title":"RINGFORGE // NEXUS MODULE","credit":"DoubleA @ AntManThePro \u00b7 RINGFORGE","boot":{"matrix_version":"v1","last_verified":"2026-09-10","next_scheduled_check":"2026-10-01T09:00:00-05:00","timezone_note":"America/Chicago","partner_oauth":"NOT LINKED","runtime_source_facts":"UNAVAILABLE"},"sources":[{"id":"S1","name":"Configure Phase","url":"https://developer.amazon.com/docs/ring/configure.html"},{"id":"S2","name":"Partner API Documentation","url":"https://developer.amazon.com/docs/ring/api-documentation.html"},{"id":"S3","name":"Getting Started","url":"https://developer.amazon.com/docs/ring/get-started.html"},{"id":"S4","name":"Release Notes","url":"https://developer.amazon.com/docs/ring/release-notes.html"},{"id":"S5","name":"Certify","url":"https://developer.amazon.com/docs/ring/certify.html"},{"id":"S6","name":"Publish","url":"https://developer.amazon.com/docs/ring/publish.html"},{"id":"S7","name":"Developer FAQ & Certification Best Practices","url":"https://developer.amazon.com/docs/ring/developer-faq.html"},{"id":"S8","name":"Ring Appstore MCP Server","url":"https://developer.amazon.com/docs/ring/ring-mcp.html"},{"id":"S9","name":"API Development Guide","url":"https://developer.amazon.com/docs/ring/develop.html"}],"platform":[{"capability":"public_apps","scope_group":"platform","read":true,"write":false,"event_based":false,"webhook_supported":false,"subscription_requirement":"n/a","certification_requirement":"public_app_full","availability":"AVAILABLE","source":["S1","S3","S7"],"notes":"Lifecycle: Configure \u2192 Build \u2192 Test \u2192 Certify \u2192 Publish","verified":true,"last_verified":"2026-09-10","webhook_types":[],"endpoints":[],"device_types":[],"limitations":[],"scope":null},{"capability":"private_apps","scope_group":"platform","read":true,"write":false,"event_based":false,"webhook_supported":false,"subscription_requirement":"ring_subscription_or_trial_per_connected_account","certification_requirement":"private_connect","availability":"AVAILABLE","source":["S1","S4","S7"],"limitations":["FAQ: up to 10 connected accounts; Jul 2026 release notes said up to 5 \u2014 prefer FAQ until reconfirmed","No weekly metrics reports","No direct private\u2192public conversion"],"notes":"Lifecycle: Configure \u2192 Build \u2192 Connect","verified":true,"last_verified":"2026-09-10","webhook_types":[],"endpoints":[],"device_types":[],"scope":null},{"capability":"dynamic_scopes","scope_group":"platform","read":true,"write":false,"event_based":false,"webhook_supported":false,"subscription_requirement":"n/a","certification_requirement":"n/a","availability":"EARLY_ACCESS","source":["S1","S4"],"limitations":["Apps using dynamic scopes can only be published once dynamic scopes reach GA for Ring customers","After certification, scopes can be added but not removed without Ring Support"],"notes":"Cameras/Doorbells, Sensors, Chimes selectable; Account & Lifecycle always granted","verified":true,"last_verified":"2026-09-10","webhook_types":[],"endpoints":[],"device_types":[],"scope":null},{"capability":"one_way_account_linking","scope_group":"platform","read":true,"write":true,"event_based":false,"webhook_supported":false,"endpoints":["POST https://oauth.ring.com/oauth/token","POST /v1/accounts/me/app-integrations","PATCH /v1/accounts/me/app-integrations","GET /v1/users/me"],"subscription_requirement":"ring_base_plan_for_device_sharing","certification_requirement":"n/a","availability":"AVAILABLE","source":["S2","S7"],"limitations":["Browser-based only; no app-to-app login"],"notes":"HMAC nonce; access ~4h; refresh ~30d; auth code 60s","verified":true,"last_verified":"2026-09-10","webhook_types":[],"device_types":[],"scope":null},{"capability":"partner_initiated_oauth","scope_group":"platform","read":true,"write":true,"event_based":false,"webhook_supported":false,"endpoints":["https://account.ring.com/account/integrations/partner-link/authorize","POST https://oauth.ring.com/oauth/token","PATCH /v1/accounts/me/app-integrations"],"subscription_requirement":"ring_base_plan_for_device_sharing","certification_requirement":"invitation_allowlist","availability":"RESTRICTED","source":["S2","S4"],"limitations":["Invitation only","Current phase: free apps only"],"notes":"OAuth2 + PKCE S256; no nonce pool","verified":true,"last_verified":"2026-09-10","webhook_types":[],"device_types":[],"scope":null},{"capability":"official_partner_sdk","scope_group":"platform","read":false,"write":false,"event_based":false,"webhook_supported":false,"subscription_requirement":"n/a","certification_requirement":"n/a","availability":"UNAVAILABLE","source":["S2"],"notes":"Use standard HTTP libraries","verified":true,"last_verified":"2026-09-10","webhook_types":[],"endpoints":[],"device_types":[],"limitations":[],"scope":null},{"capability":"ring_appstore_mcp","scope_group":"platform","read":true,"write":false,"event_based":false,"webhook_supported":false,"endpoints":["https://knowledge.appstore-mcp.ring.amazon.dev/mcp"],"subscription_requirement":"n/a","certification_requirement":"n/a","availability":"AVAILABLE","source":["S8"],"notes":"search_docs, get_doc","verified":true,"last_verified":"2026-09-10","webhook_types":[],"device_types":[],"limitations":[],"scope":null},{"capability":"developers_playground","scope_group":"platform","read":true,"write":false,"event_based":false,"webhook_supported":false,"subscription_requirement":"none_for_playground","certification_requirement":"n/a","availability":"AVAILABLE","source":["S4"],"limitations":["Not a substitute for production app linking/subscription"],"notes":"Sandbox tokens ~30 minutes","verified":true,"last_verified":"2026-09-10","webhook_types":[],"endpoints":[],"device_types":[],"scope":null},{"capability":"api_rate_limit","scope_group":"platform","read":true,"write":false,"event_based":false,"webhook_supported":false,"endpoints":["https://api.amazonvision.com"],"subscription_requirement":"n/a","certification_requirement":"n/a","availability":"AVAILABLE","source":["S2"],"limitations":["100 TPS per partner client_id","429 + Retry-After"],"notes":"Server-to-server only; browser CORS blocked","verified":true,"last_verified":"2026-09-10","webhook_types":[],"device_types":[],"scope":null}],"capabilities":[{"capability":"motion_events","scope_group":"cameras_doorbells","scope":"Cameras and Doorbells","read":true,"write":false,"event_based":true,"webhook_supported":true,"webhook_types":["motion_detected"],"endpoints":["GET /v1/history/devices/{device_id}/events"],"device_types":["camera","doorbell"],"subscription_requirement":"ring_base_plan","certification_requirement":"scope_dependent","availability":"AVAILABLE","source":["S1","S2","S7"],"limitations":["Cameras & Doorbells group is all-or-nothing","Events only within configured motion zones","Multi-cam may include component_ids; history has no component_id filter"],"notes":"attributes.sub_type e.g. human","verified":true,"last_verified":"2026-09-10"},{"capability":"doorbell_press_events","scope_group":"cameras_doorbells","scope":"Cameras and Doorbells","read":true,"write":false,"event_based":true,"webhook_supported":true,"webhook_types":["button_press"],"endpoints":["GET /v1/history/devices/{device_id}/events"],"device_types":["doorbell"],"subscription_requirement":"ring_base_plan","certification_requirement":"scope_dependent","availability":"AVAILABLE","source":["S1","S2"],"limitations":["Cameras & Doorbells group is all-or-nothing"],"verified":true,"last_verified":"2026-09-10","notes":""},{"capability":"live_stream","scope_group":"cameras_doorbells","scope":"Cameras and Doorbells","read":true,"write":true,"event_based":false,"webhook_supported":false,"endpoints":["POST /v1/devices/{device_id}/media/streaming/whep/sessions","DELETE /v1/devices/{device_id}/media/streaming/whep/sessions/{session_id}","rtsps://video.rtsp.amazonvision.com:322/v1/devices/{device_id}/stream"],"device_types":["camera","doorbell"],"subscription_requirement":"ring_base_plan","certification_requirement":"scope_dependent","availability":"AVAILABLE","source":["S1","S2","S3","S4"],"limitations":["Battery ~30s / line-powered ~60s stream guidance (Getting Started)","Mandatory watermark on live video","Optional component_id for multi-cam"],"notes":"WHEP and RTSPS documented","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"video_download","scope_group":"cameras_doorbells","scope":"Cameras and Doorbells","read":true,"write":true,"event_based":false,"webhook_supported":false,"endpoints":["POST /v1/devices/{device_id}/media/video/download"],"device_types":["camera","doorbell"],"subscription_requirement":"ring_base_plan","certification_requirement":"scope_dependent","availability":"AVAILABLE","source":["S1","S2","S4"],"limitations":["Mandatory watermark","Multi-cam: components array with one component_id per request"],"notes":"Historical MP4","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"image_snapshot","scope_group":"cameras_doorbells","scope":"Cameras and Doorbells","read":true,"write":true,"event_based":false,"webhook_supported":false,"endpoints":["POST /v1/devices/{device_id}/media/image/download"],"device_types":["camera","doorbell"],"subscription_requirement":"ring_base_plan","certification_requirement":"scope_dependent","availability":"AVAILABLE","source":["S2","S4"],"limitations":["Mandatory watermark","Not separately listed as a portal scope line item; exposed via Cameras & Doorbells media APIs"],"notes":"JPEG/PNG","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"device_discovery_status_capabilities_location_configurations","scope_group":"cameras_doorbells","scope":"Cameras and Doorbells (and other authorized device families)","read":true,"write":false,"event_based":false,"webhook_supported":false,"endpoints":["GET /v1/devices","GET /v1/devices/{device_id}","GET /v1/devices/{device_id}/status","GET /v1/devices/{device_id}/capabilities","GET /v1/devices/{device_id}/location","GET /v1/devices/{device_id}/configurations"],"device_types":["camera","doorbell","sensor","chime"],"subscription_requirement":"ring_base_plan","certification_requirement":"scope_dependent","availability":"AVAILABLE","source":["S2","S7"],"limitations":["Capability fields are read-only and do not imply device control","Sensor configurations may be null for camera-oriented attributes"],"notes":"JSON:API include=status,capabilities,location,configurations","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"sensor_contact","scope_group":"sensors","scope":"Contact Sensors (Indoor & Outdoor)","read":true,"write":false,"event_based":true,"webhook_supported":null,"endpoints":["GET /v1/devices","GET /v1/devices/{device_id}/status","GET /v1/history/devices/{device_id}/events"],"device_types":["contact_sensor"],"subscription_requirement":"unknown_verify_in_eap","certification_requirement":"early_access","availability":"EARLY_ACCESS","source":["S1","S4"],"limitations":["Early Access; subject to change before GA","Do not infer device type from capability keys alone","No battery webhook \u2014 poll battery_status.percentage","Exact sensor webhook type names not fully enumerated in pages fetched for v1 \u2014 re-verify Sensors section deep pages"],"notes":"Open/close and tamper alerts per Configure docs","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"sensor_flood_freeze","scope_group":"sensors","scope":"Flood/Freeze Sensors","read":true,"write":false,"event_based":true,"webhook_supported":null,"endpoints":["GET /v1/devices","GET /v1/devices/{device_id}/status","GET /v1/history/devices/{device_id}/events"],"device_types":["flood_freeze_sensor"],"subscription_requirement":"unknown_verify_in_eap","certification_requirement":"early_access","availability":"EARLY_ACCESS","source":["S1","S4"],"limitations":["Early Access; subject to change before GA","Exact sensor webhook type names not fully enumerated in pages fetched for v1"],"notes":"Water detection and freeze alerts","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"sensor_temp_humidity","scope_group":"sensors","scope":"Temperature & Humidity Sensors","read":true,"write":false,"event_based":true,"webhook_supported":null,"endpoints":["GET /v1/devices","GET /v1/devices/{device_id}/status","GET /v1/history/devices/{device_id}/events"],"device_types":["temperature_humidity_sensor"],"subscription_requirement":"unknown_verify_in_eap","certification_requirement":"early_access","availability":"EARLY_ACCESS","source":["S1","S4"],"limitations":["Early Access; subject to change before GA","Exact telemetry field schemas and webhook names need Sensors deep-page re-verify"],"notes":"Temperature and humidity levels and alerts","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"sensor_air_quality","scope_group":"sensors","scope":"Air Quality Monitors","read":true,"write":false,"event_based":true,"webhook_supported":null,"endpoints":["GET /v1/devices","GET /v1/devices/{device_id}/status","GET /v1/history/devices/{device_id}/events"],"device_types":["air_quality_monitor"],"subscription_requirement":"unknown_verify_in_eap","certification_requirement":"early_access","availability":"EARLY_ACCESS","source":["S1","S4"],"limitations":["Early Access; subject to change before GA","Docs cover temperature, CO, humidity, particulate matter \u2014 field-level schemas need Sensors deep-page re-verify"],"verified":true,"last_verified":"2026-09-10","webhook_types":[],"notes":""},{"capability":"chime_state_settings","scope_group":"chimes","scope":"Chimes","read":true,"write":false,"event_based":true,"webhook_supported":null,"endpoints":["GET /v1/devices/{device_id}/status","GET /v1/devices/{device_id}/capabilities","GET /v1/devices/{device_id}/configurations"],"device_types":["chime","chime_pro"],"subscription_requirement":"unknown","certification_requirement":"scope_dependent","availability":"AVAILABLE","source":["S1","S2"],"limitations":["Granted with Chimes group","Configurations audio slots/volume are read-only","Dedicated chime event type names beyond lifecycle webhooks need Chimes deep-page re-verify"],"notes":"Receive events when chime device state or settings change","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"chime_controls","scope_group":"chimes","scope":"Chime Controls","read":true,"write":true,"event_based":false,"webhook_supported":false,"endpoints":["POST /v1/devices/{device_id}/media/audio/playback"],"device_types":["chime","chime_pro"],"subscription_requirement":"unknown","certification_requirement":"scope_dependent","availability":"AVAILABLE","source":["S1","S2"],"limitations":["Optional after enabling Chimes group","Requires Chime Controls capability"],"notes":"audio_ref in body; play/change audio, ringtones, snoozes, audio settings per portal","verified":true,"last_verified":"2026-09-10","webhook_types":[]},{"capability":"integration_status","scope_group":"account_lifecycle","scope":"Account and Lifecycle (always granted)","read":true,"write":true,"event_based":true,"webhook_supported":true,"webhook_types":["app_integration_added","app_integration_removed"],"endpoints":["POST /v1/accounts/me/app-integrations","PATCH /v1/accounts/me/app-integrations"],"subscription_requirement":"none","certification_requirement":"n/a","availability":"AVAILABLE","source":["S1","S2"],"notes":"Always granted","verified":true,"last_verified":"2026-09-10","device_types":[],"limitations":[]},{"capability":"device_add_remove","scope_group":"account_lifecycle","scope":"Account and Lifecycle (always granted)","read":true,"write":false,"event_based":true,"webhook_supported":true,"webhook_types":["device_added","device_removed"],"device_types":["*"],"subscription_requirement":"none","certification_requirement":"n/a","availability":"AVAILABLE","source":["S1","S2","S7"],"limitations":["On device_removed: cleanup resources; API returns 404 for removed devices"],"notes":"Always granted","verified":true,"last_verified":"2026-09-10","endpoints":[]},{"capability":"device_statuses","scope_group":"account_lifecycle","scope":"Account and Lifecycle (always granted)","read":true,"write":false,"event_based":true,"webhook_supported":true,"webhook_types":["device_online","device_offline"],"endpoints":["GET /v1/devices/{device_id}/status"],"device_types":["*"],"subscription_requirement":"none","certification_requirement":"n/a","availability":"AVAILABLE","source":["S1","S2","S4"],"limitations":["For sensors: device_online is heartbeat-like; device_offline may lag"],"notes":"Always granted","verified":true,"last_verified":"2026-09-10"},{"capability":"subscription_changes","scope_group":"account_lifecycle","scope":"Account and Lifecycle (always granted)","read":true,"write":false,"event_based":true,"webhook_supported":true,"webhook_types":["subscription_activated","subscription_deactivated"],"endpoints":["GET /v1/accounts/me/subscriptions"],"subscription_requirement":"none","certification_requirement":"n/a","availability":"AVAILABLE","source":["S1","S2"],"notes":"Always granted","verified":true,"last_verified":"2026-09-10","device_types":[],"limitations":[]},{"capability":"battery_webhooks","scope_group":"sensors","read":true,"write":false,"event_based":false,"webhook_supported":false,"endpoints":["GET /v1/devices/{device_id}/status"],"device_types":["sensor","camera","doorbell"],"subscription_requirement":"n/a","certification_requirement":"n/a","availability":"UNAVAILABLE","source":["S4"],"limitations":["No battery webhook at any level"],"notes":"Poll battery_status.percentage from status","verified":true,"last_verified":"2026-09-10","webhook_types":[],"scope":null},{"capability":"generic_device_control_from_capabilities","scope_group":"cameras_doorbells","read":true,"write":false,"event_based":false,"webhook_supported":false,"endpoints":["GET /v1/devices/{device_id}/capabilities"],"device_types":["camera","doorbell"],"subscription_requirement":"n/a","certification_requirement":"n/a","availability":"UNAVAILABLE","source":["S7"],"limitations":["Capability values are read-only; do not imply control APIs"],"notes":"Exception: documented chime audio playback under Chime Controls","verified":true,"last_verified":"2026-09-10","webhook_types":[],"scope":null},{"capability":"event_history_by_component_id","scope_group":"cameras_doorbells","read":false,"write":false,"event_based":false,"webhook_supported":false,"endpoints":["GET /v1/history/devices/{device_id}/events"],"device_types":["multi_camera"],"subscription_requirement":"n/a","certification_requirement":"n/a","availability":"UNAVAILABLE","source":["S4"],"limitations":["History is device-level; no component_id filter"],"verified":true,"last_verified":"2026-09-10","webhook_types":[],"notes":"","scope":null}],"open_verification_items":[{"id":"OV-1","item":"Fetch stable Sensors deep pages for exact telemetry schemas and sensor-specific webhook type names","status":"OPEN","blocker":"Direct /docs/ring/sensors.html returned 404 on 2026-09-10"},{"id":"OV-2","item":"Confirm private app allowlist limit (FAQ=10 vs Release Notes Jul 2026=5) against live Developer Portal","status":"OPEN","blocker":"Docs conflict; FAQ preferred until portal confirmed"},{"id":"OV-3","item":"Fetch Chimes deep pages for full event type list beyond portal summary","status":"OPEN","blocker":"Deep link not fetched in v1"},{"id":"OV-4","item":"Connect Ring Appstore MCP for ongoing doc search inside this chat","status":"OPEN","blocker":"Awaiting user approval to add remote MCP"}],"device_families":[{"family_id":"camera_doorbell","portal_scope_group":"scope_group.cameras_doorbells","models_covered":"All Ring camera and doorbell models (portal)","availability":"AVAILABLE","endpoints_applicable":["ep.devices.*","ep.history.events","ep.media.whep.*","ep.media.rtsps","ep.media.video.download","ep.media.image.download"],"endpoints_not_applicable":["ep.media.audio.playback"],"capabilities_keys":{"video":{"fields":["configurations","codecs","ratio","max_resolution"]},"motion_detection":{"fields":["configurations"]},"components":{"when":"multi-camera devices e.g. Ring Elite"}},"webhooks":["motion_detected","button_press (doorbell)","device_*","app_integration_*","subscription_*"],"limitations":["Capability fields are read-only \u2014 not control APIs","Motion webhooks only within configured zones","Media watermark mandatory","Event history has no component_id filter"],"source":["P3","S_configure"],"last_verified":"2026-09-10"},{"family_id":"sensor_contact","portal_scope":"scope.sensors.contact","availability":"EARLY_ACCESS","endpoints_applicable":["ep.devices.list","ep.devices.get","ep.devices.status","ep.devices.capabilities","ep.devices.location","ep.devices.configurations"],"endpoints_not_applicable":["ep.media.*","ep.history.events"],"capabilities_keys":{"contact_detection":{"supported":true},"tamper_detection":{"supported":true},"battery_status":{"supported":true}},"webhooks":["contact_sensor_faulted","contact_sensor_cleared","tamper_detected","tamper_cleared","device_online","device_offline"],"limitations":["Persist webhooks \u2014 no event history","No battery webhook"],"source":["P3"],"last_verified":"2026-09-10"},{"family_id":"sensor_flood_freeze","portal_scope":"scope.sensors.flood_freeze","availability":"EARLY_ACCESS","endpoints_applicable":["ep.devices.list","ep.devices.get","ep.devices.status","ep.devices.capabilities"],"endpoints_not_applicable":["ep.media.*","ep.history.events"],"capabilities_keys":{"flood_detection":{"supported":true},"freeze_detection":{"supported":true}},"webhooks":["flood_detected","flood_cleared","freeze_detected","freeze_cleared","tamper_detected","tamper_cleared","device_online","device_offline"],"limitations":["Flood and freeze independent","Persist webhooks"],"source":["P3"],"last_verified":"2026-09-10"},{"family_id":"sensor_temperature_humidity","portal_scope":"scope.sensors.temperature_humidity","availability":"EARLY_ACCESS","endpoints_applicable":["ep.devices.list","ep.devices.get","ep.devices.status"],"endpoints_not_applicable":["ep.media.*","ep.history.events"],"capabilities_keys":{"temperature_sensor":{"supported":true},"humidity_sensor":{"supported":true}},"webhooks":["temperature_exceeded","temperature_cleared","humidity_exceeded","humidity_cleared","device_online","device_offline"],"limitations":["No tamper events","Thresholds RO","Persist webhooks"],"source":["P3"],"last_verified":"2026-09-10"},{"family_id":"sensor_air_quality","portal_scope":"scope.sensors.air_quality","availability":"EARLY_ACCESS","endpoints_applicable":["ep.devices.list","ep.devices.get","ep.devices.status"],"endpoints_not_applicable":["ep.media.*","ep.history.events"],"capabilities_keys":{"pm_detection":{"supported":true},"co_detection":{"supported":true}},"webhooks":["pm25_exceeded","pm25_cleared","co_exceeded","co_cleared","temperature_exceeded","humidity_exceeded","device_online","device_offline"],"limitations":["Do not use co_* webhooks as life-safety authority","Persist webhooks"],"source":["P3"],"last_verified":"2026-09-10"},{"family_id":"chime","portal_scope_group":"scope_group.chimes","models_covered":["Ring Chime","Ring Chime Pro"],"availability":"EARLY_ACCESS","endpoints_applicable":["ep.devices.*","ep.media.audio.playback"],"endpoints_not_applicable":["ep.media.whep.*","ep.media.rtsps","ep.media.video.download","ep.history.events"],"capabilities_keys":{"audio.supported_actions":["chime.play"]},"partner_commands":{"play_audio":{"endpoint":"ep.media.audio.playback","requires_scope":"scope_capability.chime_audio_controls","mutates_device_state":false},"change_volume":"UNAVAILABLE"},"webhooks":["device_added","device_removed"],"limitations":["Portal Audio controls wording overstates write surface","No chime-specific setting-change webhooks"],"source":["P3","S_configure"],"last_verified":"2026-09-10"}],"scope_groups":[{"ringforge_id":"scope_group.cameras_doorbells","portal_name":"Cameras and Doorbells","configurable":true,"selection_model":"toggle_group_whole","availability":"EARLY_ACCESS","covers":[{"portal_label":"Motion events"},{"portal_label":"Doorbell press events"},{"portal_label":"Livestream"},{"portal_label":"Video download"}],"source":["S_configure","P1","P3"],"last_verified":"2026-09-10"},{"ringforge_id":"scope_group.sensors","portal_name":"Sensors","configurable":true,"selection_model":"individual_toggles","availability":"EARLY_ACCESS","items":[{"portal_name":"Contact Sensors (Indoor & Outdoor)","covers":"Door/window open/close and tamper alerts.","availability":"EARLY_ACCESS"},{"portal_name":"Flood/Freeze Sensors","covers":"Water detection and freeze alerts.","availability":"EARLY_ACCESS"},{"portal_name":"Temperature & Humidity Sensors","covers":"Track temperature and humidity levels and alerts.","availability":"EARLY_ACCESS"},{"portal_name":"Air Quality Monitors","covers":"Track temperature, CO, humidity, and particulate matter.","availability":"EARLY_ACCESS"}],"source":["S_configure","P3"],"last_verified":"2026-09-10"},{"ringforge_id":"scope_group.chimes","portal_name":"Chimes","configurable":true,"selection_model":"group_plus_optional_additional_control","availability":"EARLY_ACCESS","covers":[{"portal_label":"Chime device state and settings","portal_note":"read-only"}],"additional_control_capabilities":[{"portal_name":"Audio controls","availability":"EARLY_ACCESS","api_reality":"Only playback is a partner-issued device command; volume/snooze are read-only"}],"source":["S_configure","P3"],"last_verified":"2026-09-10"},{"ringforge_id":"scope_group.account_lifecycle","portal_name":"Account and Lifecycle","configurable":false,"selection_model":"always_granted","availability":"AVAILABLE","items":[{"portal_name":"Integration status","covers":"User interacts with the app integration."},{"portal_name":"Device addition and removal","covers":"Device added or removed from a user's Ring account."},{"portal_name":"Device statuses","covers":"Device online or offline."},{"portal_name":"Subscription changes","covers":"Upgrades, downgrades, renewals, cancellations."}],"source":["S_configure","P3"],"last_verified":"2026-09-10"}],"oauth_token_scope_strings":[{"string":"ava.v1:read","context":"Partner-Initiated OAuth \u2014 docs state only this scope is supported currently","availability":"RESTRICTED","source":["P3"],"last_verified":"2026-09-10"},{"string":"ava","context":"Appears in example partner-initiated redirect / token response examples","availability":"DOCUMENTED_EXAMPLE","source":["P3"],"last_verified":"2026-09-10"}],"endpoints":[{"id":"ep.oauth.token.authorization_code","method":"POST","url":"https://oauth.ring.com/oauth/token","category":"oauth","purpose":"Exchange authorization code for tokens","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.oauth.token.refresh","method":"POST","url":"https://oauth.ring.com/oauth/token","category":"oauth","purpose":"Refresh access token","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.devices.list","method":"GET","path":"/v1/devices","category":"device","purpose":"List authorized devices","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.devices.get","method":"GET","path":"/v1/devices/{device_id}","category":"device","purpose":"Get one device","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.devices.status","method":"GET","path":"/v1/devices/{device_id}/status","category":"device","purpose":"Device status / telemetry","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.devices.capabilities","method":"GET","path":"/v1/devices/{device_id}/capabilities","category":"device","purpose":"Device capabilities (read-only)","availability":"AVAILABLE","notes":"Capability values do not imply control APIs","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.devices.location","method":"GET","path":"/v1/devices/{device_id}/location","category":"device","purpose":"Coarse location country/state","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.devices.configurations","method":"GET","path":"/v1/devices/{device_id}/configurations","category":"device","purpose":"Read configurations","availability":"AVAILABLE","notes":"Read-only; no partner write for configs documented","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.history.events","method":"GET","path":"/v1/history/devices/{device_id}/events","category":"history","purpose":"Event history","availability":"AVAILABLE","notes":"Cameras/doorbells only \u2014 sensors excluded; no component_id filter","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.media.whep.start","method":"POST","path":"/v1/devices/{device_id}/media/streaming/whep/sessions","category":"media","purpose":"Start WHEP live video","availability":"AVAILABLE","notes":"Mandatory watermark","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.media.whep.stop","method":"DELETE","path":"/v1/devices/{device_id}/media/streaming/whep/sessions/{session_id}","category":"media","purpose":"Close WHEP session","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.media.rtsps","method":"RTSPS","url":"rtsps://video.rtsp.amazonvision.com:322/v1/devices/{device_id}/stream","category":"media","purpose":"RTSPS live video","availability":"AVAILABLE","notes":"Mandatory watermark","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.media.video.download","method":"POST","path":"/v1/devices/{device_id}/media/video/download","category":"media","purpose":"Download historical MP4","availability":"AVAILABLE","notes":"Mandatory watermark","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.media.image.download","method":"POST","path":"/v1/devices/{device_id}/media/image/download","category":"media","purpose":"Image snapshot (303 to pre-signed URL)","availability":"AVAILABLE","notes":"Mandatory watermark","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.media.audio.playback","method":"POST","path":"/v1/devices/{device_id}/media/audio/playback","category":"media","purpose":"Play audio on chime","availability":"EARLY_ACCESS","notes":"Only chime partner command; changes no stored state","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.users.me","method":"GET","path":"/v1/users/me","category":"account","purpose":"User profile / Account ID","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.subscriptions.list","method":"GET","path":"/v1/accounts/me/subscriptions","category":"account","purpose":"List subscriptions/trials","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.app_integrations.post","method":"POST","path":"/v1/accounts/me/app-integrations","category":"account","purpose":"Confirm account link (one-way nonce)","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"},{"id":"ep.app_integrations.patch","method":"PATCH","path":"/v1/accounts/me/app-integrations","category":"account","purpose":"Update integration status completed/awaiting","availability":"AVAILABLE","source":["P3"],"last_verified":"2026-09-10"}],"webhooks":{"transport":"HTTPS POST","signature_header":"X-Signature","signature_alg":"HMAC-SHA256 hex with sha256= prefix","response_sla_seconds":5,"idempotency_key":"meta.request_id","payload_version":"1.1","events":[{"type":"motion_detected","family":"camera_doorbell","availability":"AVAILABLE"},{"type":"button_press","family":"doorbell","availability":"AVAILABLE"},{"type":"device_added","family":"lifecycle","availability":"AVAILABLE"},{"type":"device_removed","family":"lifecycle","availability":"AVAILABLE"},{"type":"device_online","family":"lifecycle","availability":"AVAILABLE"},{"type":"device_offline","family":"lifecycle","availability":"AVAILABLE"},{"type":"subscription_activated","family":"lifecycle","availability":"AVAILABLE"},{"type":"subscription_deactivated","family":"lifecycle","availability":"AVAILABLE"},{"type":"app_integration_added","family":"lifecycle","availability":"AVAILABLE"},{"type":"app_integration_removed","family":"lifecycle","availability":"AVAILABLE"},{"type":"contact_sensor_faulted","family":"sensor","availability":"EARLY_ACCESS"},{"type":"contact_sensor_cleared","family":"sensor","availability":"EARLY_ACCESS"},{"type":"tamper_detected","family":"sensor","availability":"EARLY_ACCESS"},{"type":"tamper_cleared","family":"sensor","availability":"EARLY_ACCESS"},{"type":"flood_detected","family":"sensor","availability":"EARLY_ACCESS"},{"type":"flood_cleared","family":"sensor","availability":"EARLY_ACCESS"},{"type":"freeze_detected","family":"sensor","availability":"EARLY_ACCESS"},{"type":"freeze_cleared","family":"sensor","availability":"EARLY_ACCESS"},{"type":"temperature_exceeded","family":"sensor","availability":"EARLY_ACCESS"},{"type":"temperature_cleared","family":"sensor","availability":"EARLY_ACCESS"},{"type":"humidity_exceeded","family":"sensor","availability":"EARLY_ACCESS"},{"type":"humidity_cleared","family":"sensor","availability":"EARLY_ACCESS"},{"type":"pm25_exceeded","family":"sensor","availability":"EARLY_ACCESS"},{"type":"pm25_cleared","family":"sensor","availability":"EARLY_ACCESS"},{"type":"co_exceeded","family":"sensor","availability":"EARLY_ACCESS","notes":"Not a life-safety substitute"},{"type":"co_cleared","family":"sensor","availability":"EARLY_ACCESS"}],"explicitly_unavailable":[{"type":"battery_*","status":"UNAVAILABLE","notes":"No battery webhook at any level"},{"type":"chime_volume_changed / chime_slot_changed","status":"UNAVAILABLE","notes":"No chime-specific setting webhooks"}],"source":["P3"],"last_verified":"2026-09-10"},"transport_rules":{"server_to_server_only":true,"browser_cors_blocked":true,"rate_limit_tps_per_partner_client_id":100,"json_api":true,"source":["P3"]},"bases":{"amazon_vision_api":"https://api.amazonvision.com","oauth":"https://oauth.ring.com","rtsps_host":"rtsps://video.rtsp.amazonvision.com:322"},"conflicts":[{"id":"CF-PRIVATE-LIMIT","title":"Private app connected-account limit","status":"OPEN CONFLICT","faq_value":10,"release_notes_value":5,"mcp_faq_later":5,"matrix_v1_preference":"FAQ (=10) until re-confirmed","note":"Do not silently pick one. Matrix v1 prefers FAQ until portal re-confirmed; MCP FAQ later said 5.","truth":"RING DOCUMENTATION FACT","sources":["S7 FAQ web scrape =10","S4 Release Notes Jul 2026 =5","MCP FAQ later =5"]},{"id":"CF-SENSOR-DEEP-404","title":"Sensor deep pages 404","status":"OPEN","note":"Direct /docs/ring/sensors.html returned 404 on 2026-09-10; OV-1 open in Matrix v1.","truth":"RING DOCUMENTATION FACT"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById('RF_DATA').textContent);
+  const FAMILY_COLORS = {
+    camera_doorbell: '#00ff87',
+    sensor_contact: '#60efff',
+    sensor_flood_freeze: '#ffcc00',
+    sensor_temperature_humidity: '#ff8c42',
+    sensor_air_quality: '#b388ff',
+    chime: '#ff0080'
+  };
+  const FAMILY_LABELS = {
+    camera_doorbell: 'Cameras / Doorbells',
+    sensor_contact: 'Contact Sensors',
+    sensor_flood_freeze: 'Flood / Freeze',
+    sensor_temperature_humidity: 'Temp / Humidity',
+    sensor_air_quality: 'Air Quality',
+    chime: 'Chime'
+  };
+  const FAMILY_EDGES = [
+    ['camera_doorbell','chime'],
+    ['camera_doorbell','sensor_contact'],
+    ['sensor_contact','sensor_flood_freeze'],
+    ['sensor_flood_freeze','sensor_temperature_humidity'],
+    ['sensor_temperature_humidity','sensor_air_quality'],
+    ['chime','sensor_contact']
+  ];
+
+  const $ = (s, el=document) => el.querySelector(s);
+  const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+  const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  const DEFAULT_KERNEL = `// RINGFORGE DERIVED scorer — lower is better; Infinity rejects
+function scoreIncident(ev, last, familyDist, dtMs, WINDOW_MS) {
+  if (dtMs > WINDOW_MS) return Infinity;
+  const sameLoc = ev.location_id === last.location_id;
+  if (!sameLoc && familyDist > 1) return Infinity;
+  return (sameLoc ? 0 : 2) + familyDist + (dtMs / WINDOW_MS);
+}`;
+
+  let scoreFn = null;
+  function compileKernel(src) {
+    const wrapped = src + '\n; return scoreIncident;';
+    const fn = new Function(wrapped)();
+    if (typeof fn !== 'function') throw new Error('scoreIncident not defined');
+    // dry run
+    const n = fn(
+      {location_id:'loc.front', family:'camera_doorbell', type:'motion_detected', ts:1},
+      {location_id:'loc.front', family:'camera_doorbell', type:'motion_detected', ts:0},
+      0, 10, 90000
+    );
+    if (typeof n !== 'number' || Number.isNaN(n)) throw new Error('scorer must return a number');
+    scoreFn = fn;
+    return true;
+  }
+
+  const bootLines = [
+    '<span class="dim">NEXUS · NExtended Xperimental USers</span>',
+    'RINGFORGE KERNEL <span class="y">3.0.0</span>',
+    'DoubleA <span class="hot">@AntManThePro</span>',
+    '',
+    '▸ locking contracts… <span class="y">OK</span>',
+    '▸ Capability Matrix v1 · last verified <span class="y">2026-09-10 CT</span>',
+    '▸ next check <span class="y">2026-10-01 09:00 CT</span>',
+    '▸ Canonical Scope Registry v1… <span class="y">LOADED</span>',
+    '▸ Endpoint + Device registries… <span class="y">LOADED</span>',
+    '▸ correlator kernel (factory)… <span class="y">ARMED</span>',
+    '',
+    'Partner OAuth: <span class="hot">NOT LINKED</span>',
+    'RING SOURCE FACT (runtime): <span class="hot">UNAVAILABLE</span> until linked',
+    '',
+    'Truth model: DOCUMENTATION FACT · SOURCE FACT · DERIVED · AI · MOCK',
+    'Rule: <span class="y">Never sacrifice truth for features.</span>',
+    '',
+    'Mission control ready.'
+  ];
+  const bootLog = $('#boot-log');
+  let bi = 0;
+  function tickBoot(){
+    if (bi < bootLines.length) {
+      bootLog.innerHTML += (bi? '\n':'') + bootLines[bi++];
+      setTimeout(tickBoot, 70 + Math.random()*50);
+    }
+  }
+  tickBoot();
+  let booted = false;
+  function enterApp(){
+    if (booted) return;
+    booted = true;
+    $('#boot').style.display = 'none';
+    $('#kernel').hidden = false;
+    $('#dock').hidden = false;
+    $('#app').classList.add('on');
+    initAll();
+    const hash = (location.hash||'').replace('#','');
+    if (/^[1-8]$/.test(hash)) goPanel(hash);
+  }
+  $('#boot').addEventListener('click', enterApp);
+  window.addEventListener('keydown', e => {
+    if (!booted && (e.code === 'Space' || e.key === 'Enter')) { e.preventDefault(); enterApp(); }
+  });
+
+  function updateClock(){
+    try {
+      const fmt = new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+      $('#clock').textContent = fmt.format(new Date()) + ' CT';
+    } catch { $('#clock').textContent = new Date().toISOString(); }
+  }
+  setInterval(updateClock, 1000); updateClock();
+
+  function goPanel(n){
+    n = String(n);
+    $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === n));
+    $$('#dock button').forEach(b => b.classList.toggle('on', b.dataset.go === n));
+    try { history.replaceState(null,'','#'+n); } catch {}
+    if (n === '1') resizeTopo();
+    if (n === '3') { resizeRadar(); renderBus(); }
+  }
+  $$('#dock button').forEach(b => b.addEventListener('click', () => goPanel(b.dataset.go)));
+
+  let busPaused = false;
+  window.addEventListener('keydown', e => {
+    if (!booted) return;
+    if (e.key === '/' && !e.metaKey && !e.ctrlKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'SELECT') {
+      e.preventDefault(); openSearch();
+    } else if (e.key === 'Escape') {
+      closeSearch(); closeModal();
+    } else if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault(); toggleBus();
+    } else if (['1','2','3','4','5','6','7','8'].includes(e.key) && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      goPanel(e.key);
+    } else if ((e.key === 'e' || e.key === 'E') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      exportPayload();
+    }
+  });
+
+  function openSearch(){ $('#search').classList.add('on'); $('#search-input').value=''; $('#search-hits').innerHTML=''; $('#search-input').focus(); }
+  function closeSearch(){ $('#search').classList.remove('on'); }
+  $('#search').addEventListener('click', e => { if (e.target.id==='search') closeSearch(); });
+  $('#search-input').addEventListener('input', () => {
+    const q = $('#search-input').value.trim().toLowerCase();
+    const hits = [];
+    if (q.length >= 1) {
+      allMatrixRows().forEach(r => {
+        if (JSON.stringify(r).toLowerCase().includes(q)) hits.push({kind:'capability', id:r.capability, label:r.capability, data:r});
+      });
+      DATA.webhooks.events.forEach(w => {
+        if (w.type.includes(q) || (w.family||'').includes(q)) hits.push({kind:'webhook', id:w.type, label:w.type, data:w});
+      });
+      DATA.endpoints.forEach(ep => {
+        const hay = (ep.id+' '+(ep.path||ep.url||'')+' '+ep.purpose).toLowerCase();
+        if (hay.includes(q)) hits.push({kind:'endpoint', id:ep.id, label:(ep.method||'')+' '+(ep.path||ep.url||''), data:ep});
+      });
+    }
+    $('#search-hits').innerHTML = hits.slice(0,40).map(h =>
+      `<div data-kind="${esc(h.kind)}" data-id="${esc(h.id)}"><span class="truth">${esc(h.kind)}</span> ${esc(h.label)}</div>`
+    ).join('') || '<div class="empty">No hits</div>';
+    $$('#search-hits div[data-id]').forEach(el => el.addEventListener('click', () => {
+      const kind = el.dataset.kind;
+      closeSearch();
+      if (kind === 'capability') { goPanel(2); selectMatrix(el.dataset.id); }
+      else if (kind === 'endpoint') goPanel(5);
+      else if (kind === 'webhook') goPanel(3);
+      showModal(kind.toUpperCase(), hits.find(h => h.id===el.dataset.id)?.data);
+    }));
+  });
+
+  function showModal(title, obj){
+    $('#modal-title').textContent = title;
+    $('#modal-body').textContent = JSON.stringify(obj, null, 2);
+    $('#modal').classList.add('on');
+  }
+  function closeModal(){ $('#modal').classList.remove('on'); }
+  $('#modal-close').addEventListener('click', closeModal);
+  $('#modal').addEventListener('click', e => { if (e.target.id==='modal') closeModal(); });
+
+  function allMatrixRows(){ return [...DATA.platform, ...DATA.capabilities]; }
+
+  function familyDist(a, b){
+    if (a===b) return 0;
+    const adj = {};
+    FAMILY_EDGES.forEach(([u,v]) => {
+      (adj[u]=adj[u]||[]).push(v);
+      (adj[v]=adj[v]||[]).push(u);
+    });
+    const q=[a], seen=new Set([a]), dist={[a]:0};
+    while(q.length){
+      const cur=q.shift();
+      for (const nxt of (adj[cur]||[])){
+        if (seen.has(nxt)) continue;
+        seen.add(nxt); dist[nxt]=dist[cur]+1; q.push(nxt);
+        if (nxt===b) return dist[nxt];
+      }
+    }
+    return Infinity;
+  }
+
+  let topo = null;
+  function initTopo(){
+    const canvas = $('#topo-canvas');
+    const ctx = canvas.getContext('2d');
+    const families = DATA.device_families;
+    const nodes = families.map((f,i) => {
+      const ang = (i / families.length) * Math.PI * 2 - Math.PI/2;
+      return {
+        id: f.family_id,
+        label: FAMILY_LABELS[f.family_id] || f.family_id,
+        color: FAMILY_COLORS[f.family_id] || '#60efff',
+        data: f,
+        x: Math.cos(ang)*120, y: Math.sin(ang)*90,
+        vx:0, vy:0, r: 22 + Math.min(10, (f.webhooks||[]).length)
+      };
+    });
+    const idMap = Object.fromEntries(nodes.map(n => [n.id,n]));
+    const links = FAMILY_EDGES.filter(([a,b]) => idMap[a] && idMap[b]).map(([a,b]) => ({a:idMap[a], b:idMap[b]}));
+    nodes.forEach(n => {
+      if (n.id !== 'camera_doorbell' && !links.some(l => (l.a.id===n.id&&l.b.id==='camera_doorbell')||(l.b.id===n.id&&l.a.id==='camera_doorbell'))) {
+        if (idMap.camera_doorbell && n.id.startsWith('sensor')) links.push({a:n,b:idMap.camera_doorbell, weak:true});
+      }
+    });
+
+    $('#topo-legend').innerHTML = nodes.map(n =>
+      `<span><i class="dot" style="background:${n.color};box-shadow:0 0 6px ${n.color}"></i>${esc(n.label)} <span class="status-chip ${esc(n.data.availability)}">${esc(n.data.availability)}</span></span>`
+    ).join('');
+
+    let selected = null, dragging = null, particles = [];
+    let scale = 1, ox = 0, oy = 0;
+    let pointers = new Map();
+
+    function resize(){
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio||1, 2);
+      canvas.width = Math.max(1, rect.width * dpr);
+      canvas.height = Math.max(1, Math.max(260, rect.height) * dpr);
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = Math.max(260, rect.height) + 'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function screenToWorld(sx, sy){
+      const rect = canvas.getBoundingClientRect();
+      return { x: (sx - rect.left - rect.width/2 - ox)/scale, y: (sy - rect.top - rect.height/2 - oy)/scale };
+    }
+    function hit(sx,sy){
+      const w = screenToWorld(sx,sy);
+      for (let i=nodes.length-1;i>=0;i--){
+        const n = nodes[i];
+        const dx=w.x-n.x, dy=w.y-n.y;
+        if (dx*dx+dy*dy < (n.r+6)*(n.r+6)) return n;
+      }
+      return null;
+    }
+
+    function showInspector(n){
+      selected = n;
+      const f = n.data;
+      const relatedCaps = allMatrixRows().filter(r => {
+        if (f.family_id==='camera_doorbell') return r.scope_group==='cameras_doorbells' || (r.device_types||[]).includes('camera')||(r.device_types||[]).includes('doorbell');
+        if (f.family_id==='chime') return r.scope_group==='chimes' || (r.device_types||[]).includes('chime');
+        if (f.family_id==='sensor_contact') return r.capability==='sensor_contact';
+        if (f.family_id==='sensor_flood_freeze') return r.capability==='sensor_flood_freeze';
+        if (f.family_id==='sensor_temperature_humidity') return r.capability==='sensor_temp_humidity';
+        if (f.family_id==='sensor_air_quality') return r.capability==='sensor_air_quality';
+        return false;
+      });
+      const cmds = f.partner_commands ? `<pre style="font-size:10px">${esc(JSON.stringify(f.partner_commands,null,2))}</pre>` : '<span class="help">No partner write commands in registry for this family (except chime playback).</span>';
+      $('#topo-inspector').innerHTML = `
+        <h3>${esc(n.label)}</h3>
+        <div class="taglist">
+          <span class="truth fact">RING DOCUMENTATION FACT</span>
+          <span class="status-chip ${esc(f.availability)}">${esc(f.availability)}</span>
+          <span class="tag">${esc(f.family_id)}</span>
+        </div>
+        <div class="kv">
+          <b>family_id</b><span><code>${esc(f.family_id)}</code></span>
+          <b>scope</b><span>${esc(f.portal_scope_group || f.portal_scope || '—')}</span>
+          <b>verified</b><span>${esc(f.last_verified)}</span>
+          <b>source</b><span>${esc((f.source||[]).join(', '))}</span>
+        </div>
+        <h3 style="font-size:13px;margin-top:12px">Endpoints applicable</h3>
+        <div style="font-size:10px;color:var(--c)">${(f.endpoints_applicable||[]).map(esc).join('<br/>')||'—'}</div>
+        <h3 style="font-size:13px;margin-top:12px">Not applicable</h3>
+        <div style="font-size:10px;color:var(--muted)">${(f.endpoints_not_applicable||[]).map(esc).join('<br/>')||'—'}</div>
+        <h3 style="font-size:13px;margin-top:12px">Webhooks</h3>
+        <div class="taglist">${(f.webhooks||[]).map(w=>`<span class="tag">${esc(w)}</span>`).join('')||'<span class="help">none listed</span>'}</div>
+        <h3 style="font-size:13px;margin-top:12px">Capabilities keys</h3>
+        <pre style="font-size:10px;white-space:pre-wrap">${esc(JSON.stringify(f.capabilities_keys,null,2))}</pre>
+        <h3 style="font-size:13px;margin-top:12px">Partner commands</h3>
+        ${cmds}
+        <h3 style="font-size:13px;margin-top:12px">Limitations</h3>
+        <ul class="tight">${(f.limitations||[]).map(l=>`<li>${esc(l)}</li>`).join('')}</ul>
+        <h3 style="font-size:13px;margin-top:12px">Related matrix rows</h3>
+        <div class="taglist">${relatedCaps.map(c=>`<span class="tag" style="cursor:pointer" data-cap="${esc(c.capability)}">${esc(c.capability)}</span>`).join('')||'—'}</div>
+        <p class="help" style="margin-top:10px">Runtime telemetry: <span class="truth unavail">RING SOURCE FACT (runtime) — UNAVAILABLE</span></p>
+      `;
+      $$('#topo-inspector [data-cap]').forEach(el => el.addEventListener('click', () => { goPanel(2); selectMatrix(el.dataset.cap); }));
+    }
+
+    canvas.addEventListener('pointerdown', e => {
+      canvas.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId, {x:e.clientX,y:e.clientY});
+      const n = hit(e.clientX, e.clientY);
+      if (n) { dragging = n; showInspector(n); }
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (!pointers.has(e.pointerId)) return;
+      const prev = pointers.get(e.pointerId);
+      const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+      pointers.set(e.pointerId, {x:e.clientX,y:e.clientY});
+      if (pointers.size === 2) { ox += dx/2; oy += dy/2; }
+      else if (dragging) {
+        const w = screenToWorld(e.clientX, e.clientY);
+        dragging.x = w.x; dragging.y = w.y; dragging.vx=0; dragging.vy=0;
+      } else if (e.buttons===1) { ox += dx; oy += dy; }
+    });
+    canvas.addEventListener('pointerup', e => { pointers.delete(e.pointerId); dragging=null; });
+    canvas.addEventListener('pointercancel', e => { pointers.delete(e.pointerId); dragging=null; });
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      const f = e.deltaY > 0 ? 0.92 : 1.08;
+      scale = Math.max(0.4, Math.min(2.5, scale * f));
+    }, {passive:false});
+
+    function spawnParticle(){
+      if (!links.length) return;
+      const L = links[Math.floor(Math.random()*links.length)];
+      particles.push({L, t:0, speed:0.004+Math.random()*0.008, color: L.a.color});
+      if (particles.length > 48) particles.shift();
+    }
+    setInterval(spawnParticle, 200);
+
+    function step(){
+      const N = nodes.length;
+      for (let i=0;i<N;i++){
+        for (let j=i+1;j<N;j++){
+          let dx = nodes[j].x - nodes[i].x, dy = nodes[j].y - nodes[i].y;
+          let d2 = dx*dx+dy*dy || 1;
+          let d = Math.sqrt(d2);
+          let rep = 1800 / d2;
+          let fx = (dx/d)*rep, fy=(dy/d)*rep;
+          nodes[i].vx -= fx; nodes[i].vy -= fy;
+          nodes[j].vx += fx; nodes[j].vy += fy;
+        }
+      }
+      links.forEach(L => {
+        let dx = L.b.x - L.a.x, dy = L.b.y - L.a.y;
+        let d = Math.sqrt(dx*dx+dy*dy)||1;
+        let target = L.weak ? 160 : 110;
+        let f = (d - target) * 0.012;
+        let fx = (dx/d)*f, fy=(dy/d)*f;
+        L.a.vx += fx; L.a.vy += fy;
+        L.b.vx -= fx; L.b.vy -= fy;
+      });
+      nodes.forEach(n => {
+        n.vx += -n.x * 0.002; n.vy += -n.y * 0.002;
+        if (n !== dragging) {
+          n.vx *= 0.86; n.vy *= 0.86;
+          n.x += n.vx; n.y += n.vy;
+        }
+      });
+
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width, h = Math.max(260, rect.height);
+      ctx.clearRect(0,0,w,h);
+      ctx.save();
+      ctx.translate(w/2 + ox, h/2 + oy);
+      ctx.scale(scale, scale);
+      links.forEach(L => {
+        ctx.beginPath();
+        ctx.moveTo(L.a.x, L.a.y);
+        ctx.lineTo(L.b.x, L.b.y);
+        ctx.strokeStyle = L.weak ? 'rgba(96,239,255,0.12)' : 'rgba(0,255,135,0.28)';
+        ctx.lineWidth = L.weak ? 1 : 1.5;
+        ctx.stroke();
+      });
+      particles.forEach(p => {
+        p.t += p.speed;
+        if (p.t > 1) p.t = 0;
+        const x = p.L.a.x + (p.L.b.x - p.L.a.x)*p.t;
+        const y = p.L.a.y + (p.L.b.y - p.L.a.y)*p.t;
+        ctx.beginPath();
+        ctx.arc(x,y,2.2,0,Math.PI*2);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+      nodes.forEach(n => {
+        ctx.beginPath();
+        ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+        ctx.fillStyle = 'rgba(10,10,15,0.92)';
+        ctx.fill();
+        ctx.strokeStyle = n.color;
+        ctx.lineWidth = selected===n ? 3 : 1.8;
+        ctx.shadowColor = n.color;
+        ctx.shadowBlur = selected===n ? 18 : 10;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(n.x,n.y,5,0,Math.PI*2);
+        ctx.fillStyle = n.color;
+        ctx.fill();
+        ctx.fillStyle = '#d8ffe8';
+        ctx.font = '600 10px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(n.label.split(' / ')[0].slice(0,14), n.x, n.y + n.r + 14);
+      });
+      ctx.restore();
+      ctx.fillStyle = 'rgba(96,239,255,0.55)';
+      ctx.font = '10px "IBM Plex Mono", monospace';
+      ctx.fillText('RINGFORGE DERIVED · family adjacency graph (not live property map)', 10, 18);
+      ctx.fillStyle = 'rgba(255,0,128,0.7)';
+      ctx.fillText('MOCK ADAPTER · no runtime devices', 10, 32);
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    topo = {resize, nodes, idMap};
+    radarNodes = nodes;
+    if (nodes[0]) showInspector(nodes[0]);
+  }
+  function resizeTopo(){ if (topo) topo.resize(); }
+
+  let mxSelected = null;
+  function initMatrix(){
+    const rows = allMatrixRows();
+    const statuses = [...new Set(rows.map(r => r.availability))].sort();
+    const scopes = [...new Set(rows.map(r => r.scope_group || '—'))].sort();
+    statuses.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s.replace('_',' '); $('#mx-status').appendChild(o); });
+    scopes.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; $('#mx-scope').appendChild(o); });
+    const render = () => {
+      const q = $('#mx-q').value.trim().toLowerCase();
+      const status = $('#mx-status').value;
+      const scope = $('#mx-scope').value;
+      const flags = $('#mx-flags').value;
+      const filtered = rows.filter(r => {
+        if (status && r.availability !== status) return false;
+        if (scope && (r.scope_group||'—') !== scope) return false;
+        if (flags==='read' && !r.read) return false;
+        if (flags==='write' && !r.write) return false;
+        if (flags==='event' && !r.event_based) return false;
+        if (flags==='webhook' && !r.webhook_supported) return false;
+        if (q) {
+          const hay = [r.capability,r.scope,r.scope_group,(r.notes||''),(r.endpoints||[]).join(' '),(r.webhook_types||[]).join(' '),(r.source||[]).join(' ')].join(' ').toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+      $('#mx-count').textContent = filtered.length + ' / ' + rows.length;
+      const tb = $('#mx-table tbody');
+      tb.innerHTML = filtered.map(r => {
+        const av = r.availability || 'UNKNOWN';
+        const rw = `<span class="rw"><i class="${r.read?'on':''}">R</i><i class="${r.write?'on':''}">W</i><i class="${r.event_based?'on':''}">E</i><i class="${r.webhook_supported?'on':''}">H</i></span>`;
+        return `<tr data-id="${esc(r.capability)}" class="${mxSelected===r.capability?'sel':''}">
+          <td><code>${esc(r.capability)}</code></td>
+          <td><span class="status-chip ${esc(av)}">${esc(av.replace('_',' '))}</span></td>
+          <td>${esc(r.scope_group||'—')}</td>
+          <td>${rw}</td>
+          <td>${esc((r.source||[]).join(','))}</td>
+          <td>${esc(r.last_verified||'—')}</td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="6" class="empty">No matches</td></tr>`;
+      $$('#mx-table tbody tr[data-id]').forEach(tr => tr.addEventListener('click', () => selectMatrix(tr.dataset.id)));
+    };
+    ['mx-q','mx-status','mx-scope','mx-flags'].forEach(id => $('#'+id).addEventListener('input', render));
+    ['mx-status','mx-scope','mx-flags'].forEach(id => $('#'+id).addEventListener('change', render));
+    window.selectMatrix = function(id){
+      mxSelected = id;
+      const r = rows.find(x => x.capability === id);
+      if (!r) return;
+      render();
+      $('#mx-inspector').innerHTML = `
+        <h3>${esc(r.capability)}</h3>
+        <div class="taglist">
+          <span class="truth fact">RING DOCUMENTATION FACT</span>
+          <span class="status-chip ${esc(r.availability)}">${esc(r.availability)}</span>
+          ${r.verified?'<span class="tag">verified</span>':''}
+        </div>
+        <div class="kv">
+          <b>scope</b><span>${esc(r.scope||r.scope_group||'—')}</span>
+          <b>read/write</b><span>${r.read?'YES':'no'} / ${r.write?'YES':'no'}</span>
+          <b>event</b><span>${r.event_based?'YES':'no'}</span>
+          <b>webhook</b><span>${r.webhook_supported===null?'UNKNOWN (null in contract)':(r.webhook_supported?'YES':'no')}</span>
+          <b>types</b><span>${esc((r.webhook_types||[]).join(', ')||'—')}</span>
+          <b>devices</b><span>${esc((r.device_types||[]).join(', ')||'—')}</span>
+          <b>subscription</b><span>${esc(r.subscription_requirement||'—')}</span>
+          <b>cert</b><span>${esc(r.certification_requirement||'—')}</span>
+          <b>source</b><span>${esc((r.source||[]).join(', '))}</span>
+          <b>verified</b><span>${esc(r.last_verified)}</span>
+        </div>
+        <h3 style="font-size:13px">Endpoints</h3>
+        <ul class="tight">${(r.endpoints||[]).map(e=>`<li><code>${esc(e)}</code></li>`).join('')||'<li>—</li>'}</ul>
+        <h3 style="font-size:13px">Limitations</h3>
+        <ul class="tight">${(r.limitations||[]).map(l=>`<li>${esc(l)}</li>`).join('')||'<li>none listed</li>'}</ul>
+        <h3 style="font-size:13px">Notes</h3>
+        <p>${esc(r.notes||'—')}</p>
+        <button class="btn" id="mx-json">VIEW FULL JSON</button>
+      `;
+      $('#mx-json')?.addEventListener('click', () => showModal(r.capability, r));
+    };
+    render();
+  }
+
+  const documentedEvents = DATA.webhooks.events.slice();
+  function familyForEvent(type, familyHint){
+    if (familyHint==='camera_doorbell' || familyHint==='doorbell') return 'camera_doorbell';
+    if (familyHint==='lifecycle') return 'camera_doorbell';
+    if (familyHint==='sensor') {
+      if (type.startsWith('contact')||type.startsWith('tamper')) return 'sensor_contact';
+      if (type.startsWith('flood')||type.startsWith('freeze')) return 'sensor_flood_freeze';
+      if (type.startsWith('temperature')||type.startsWith('humidity')) return 'sensor_temperature_humidity';
+      if (type.startsWith('pm25')||type.startsWith('co_')) return 'sensor_air_quality';
+      return 'sensor_contact';
+    }
+    if (type==='button_press'||type==='motion_detected') return 'camera_doorbell';
+    return 'camera_doorbell';
+  }
+  const LOCATIONS = ['loc.front','loc.garage','loc.kitchen','loc.basement'];
+  let events = [], incidents = [], eventSeq = 0, pulses = [];
+  let radarNodes = [];
+
+  function toggleBus(){
+    busPaused = !busPaused;
+    $('#bus-pause').textContent = busPaused ? 'SPACE · RESUME' : 'SPACE · PAUSE';
+  }
+  $('#bus-pause').addEventListener('click', toggleBus);
+
+  const WINDOW_MS = 90000;
+  function emitEvent(){
+    if (busPaused || !booted) return;
+    const tmpl = documentedEvents[Math.floor(Math.random()*documentedEvents.length)];
+    const fam = familyForEvent(tmpl.type, tmpl.family);
+    let location = LOCATIONS[Math.floor(Math.random()*LOCATIONS.length)];
+    if (events.length && Math.random() < 0.55) {
+      const recent = events[0];
+      if (Date.now() - recent.ts < 90000) location = recent.location_id;
+    }
+    const ev = {
+      id: 'mock-' + (++eventSeq),
+      type: tmpl.type,
+      family: fam,
+      webhook_family: tmpl.family,
+      availability: tmpl.availability,
+      location_id: location,
+      ts: Date.now(),
+      truth: 'MOCK ADAPTER',
+      scope_refs: tmpl.scope_refs || []
+    };
+    events.unshift(ev);
+    if (events.length > 80) events.pop();
+    pulses.push({family: fam, t: 1, color: FAMILY_COLORS[fam] || '#60efff', type: ev.type});
+    if (pulses.length > 24) pulses.shift();
+    correlate(ev);
+    renderBus();
+  }
+
+  function correlate(ev){
+    let best = null, bestScore = Infinity;
+    for (const inc of incidents) {
+      if (inc.closed) continue;
+      const last = inc.events[0];
+      const dt = ev.ts - last.ts;
+      const d = familyDist(ev.family, last.family);
+      let score = Infinity;
+      try {
+        score = scoreFn(ev, last, d, dt, WINDOW_MS);
+        if (typeof score !== 'number' || Number.isNaN(score)) score = Infinity;
+      } catch { score = Infinity; }
+      if (score < bestScore) { bestScore = score; best = inc; }
+    }
+    if (best && bestScore < Infinity) {
+      best.events.unshift(ev);
+      best.updated = ev.ts;
+      best.qualifier = 'LIKELY RELATED';
+      best.rule = `kernel score=${bestScore.toFixed(2)} · Δt=${ev.ts-best.events[1].ts}ms`;
+    } else {
+      incidents.unshift({
+        id: 'inc-' + eventSeq,
+        events: [ev],
+        created: ev.ts,
+        updated: ev.ts,
+        qualifier: 'LIKELY RELATED',
+        rule: 'seed event; awaiting peers accepted by kernel',
+        truth: 'RINGFORGE DERIVED',
+        closed: false
+      });
+    }
+    incidents.forEach(inc => { if (ev.ts - inc.updated > WINDOW_MS * 2) inc.closed = true; });
+    if (incidents.length > 40) incidents.length = 40;
+  }
+
+  function renderBus(){
+    $('#bus-stats').textContent = `${events.length} events · ${incidents.filter(i=>!i.closed).length} open incidents · ${busPaused?'PAUSED':'LIVE MOCK'}`;
+    $('#event-stream').innerHTML = events.slice(0,30).map(ev => `
+      <div class="evt">
+        <div><span class="type">${esc(ev.type)}</span> · <span class="tag">${esc(ev.family)}</span></div>
+        <div class="meta">${new Date(ev.ts).toLocaleTimeString()} · ${esc(ev.location_id)} · ${esc(ev.availability)}</div>
+        <div class="taglist"><span class="truth mock">MOCK ADAPTER</span><span class="truth fact">type ∈ endpoint registry</span></div>
+      </div>
+    `).join('') || '<div class="empty">Waiting for mock stream…</div>';
+    $('#incident-stream').innerHTML = incidents.slice(0,16).map(inc => `
+      <div class="incident">
+        <h4>${esc(inc.id)} · ${esc(inc.qualifier)}${inc.closed?' · closed':''}</h4>
+        <div class="taglist"><span class="truth derived">RINGFORGE DERIVED</span><span class="truth mock">events are MOCK</span></div>
+        <div class="help">rule: ${esc(inc.rule)}</div>
+        <ul class="tight">${inc.events.slice(0,6).map(e=>`<li><code>${esc(e.type)}</code> @ ${esc(e.location_id)} · ${esc(e.family)}</li>`).join('')}</ul>
+      </div>
+    `).join('');
+  }
+
+  let radarResize = null;
+  function initRadar(){
+    const canvas = $('#radar-canvas');
+    const ctx = canvas.getContext('2d');
+    function resize(){
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio||1, 2);
+      canvas.width = Math.max(1, rect.width * dpr);
+      canvas.height = Math.max(1, Math.max(200, rect.height) * dpr);
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = Math.max(200, rect.height) + 'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    resize();
+    radarResize = resize;
+    window.addEventListener('resize', resize);
+
+    const order = ['camera_doorbell','chime','sensor_contact','sensor_flood_freeze','sensor_temperature_humidity','sensor_air_quality'];
+    function step(){
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width, h = Math.max(200, rect.height);
+      ctx.clearRect(0,0,w,h);
+      const cx = w/2, cy = h/2 + 6;
+      const R = Math.min(w,h)*0.36;
+      ctx.strokeStyle = 'rgba(0,255,135,0.12)';
+      ctx.lineWidth = 1;
+      for (let i=1;i<=3;i++){
+        ctx.beginPath(); ctx.arc(cx,cy,R*i/3,0,Math.PI*2); ctx.stroke();
+      }
+      const pts = {};
+      order.forEach((id,i) => {
+        const a = (i/order.length)*Math.PI*2 - Math.PI/2;
+        pts[id] = {x: cx + Math.cos(a)*R, y: cy + Math.sin(a)*R, color: FAMILY_COLORS[id], label: FAMILY_LABELS[id]};
+      });
+      FAMILY_EDGES.forEach(([a,b]) => {
+        if (!pts[a]||!pts[b]) return;
+        ctx.beginPath();
+        ctx.moveTo(pts[a].x, pts[a].y);
+        ctx.lineTo(pts[b].x, pts[b].y);
+        ctx.strokeStyle = 'rgba(96,239,255,0.18)';
+        ctx.stroke();
+      });
+      pulses.forEach(p => {
+        p.t *= 0.965;
+        const pt = pts[p.family];
+        if (!pt) return;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 8 + (1-p.t)*28, 0, Math.PI*2);
+        ctx.strokeStyle = p.color;
+        ctx.globalAlpha = p.t * 0.85;
+        ctx.lineWidth = 2;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 16;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+      });
+      pulses = pulses.filter(p => p.t > 0.04);
+      Object.entries(pts).forEach(([id,pt]) => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 7, 0, Math.PI*2);
+        ctx.fillStyle = '#0a0a0f';
+        ctx.fill();
+        ctx.strokeStyle = pt.color;
+        ctx.lineWidth = 2;
+        ctx.shadowColor = pt.color;
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = pt.color;
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText((FAMILY_LABELS[id]||id).split(' / ')[0].slice(0,12), pt.x, pt.y + 20);
+      });
+      ctx.fillStyle = 'rgba(255,0,128,0.7)';
+      ctx.font = '10px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('MOCK RADAR · pulses = documented webhook types only', 10, 16);
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function resizeRadar(){ if (radarResize) radarResize(); }
+
+  function initScopes(){
+    const grid = $('#scope-grid');
+    grid.innerHTML = DATA.scope_groups.map(g => {
+      const items = (g.items || g.covers || []).map(it => {
+        if (typeof it === 'string') return `<li>${esc(it)}</li>`;
+        return `<li><b>${esc(it.portal_name || it.portal_label || it.ringforge_id)}</b> — ${esc(it.covers || it.portal_covers || it.portal_note || '')}</li>`;
+      }).join('');
+      const extra = (g.additional_control_capabilities||[]).map(a =>
+        `<li><b>${esc(a.portal_name)}</b> · ${esc(a.availability)} · <span class="help">${esc(a.api_reality||'')}</span></li>`
+      ).join('');
+      return `<div class="scope-card">
+        <h3>${esc(g.portal_name)}</h3>
+        <div class="taglist">
+          <span class="status-chip ${esc(g.availability)}">${esc(g.availability.replace('_',' '))}</span>
+          <span class="tag">${esc(g.selection_model)}</span>
+          <span class="tag">${g.configurable?'configurable':'always granted'}</span>
+        </div>
+        <ul class="tight">${items}${extra}</ul>
+        <div class="help">source ${(g.source||[]).join(', ')} · verified ${esc(g.last_verified)}</div>
+      </div>`;
+    }).join('');
+
+    const cf = DATA.conflicts[0];
+    $('#conflict-box').innerHTML = `
+      <h3>⚠ OPEN CONFLICT · ${esc(cf.title)}</h3>
+      <p><span class="truth fact">RING DOCUMENTATION FACT</span> — do not silently pick one value.</p>
+      <div class="kv" style="margin-top:8px">
+        <b>FAQ (web)</b><span><b style="color:var(--y)">${cf.faq_value}</b> connected accounts</span>
+        <b>Release Notes</b><span><b style="color:var(--y)">${cf.release_notes_value}</b> (Jul 2026)</span>
+        <b>MCP FAQ later</b><span><b style="color:var(--y)">${cf.mcp_faq_later}</b></span>
+        <b>Matrix v1</b><span>${esc(cf.matrix_v1_preference)}</span>
+      </div>
+      <p>${esc(cf.note)}</p>
+      <p class="help">Also open: sensor deep pages 404 (OV-1), chimes deep events (OV-3).</p>
+    `;
+
+    $('#oauth-box').innerHTML = `
+      <h3 class="display" style="color:var(--c);margin:0 0 8px">OAuth / Linking</h3>
+      <ul class="tight">
+        <li>Account &amp; Lifecycle: <b>always granted</b> <span class="truth fact">RING DOCUMENTATION FACT</span></li>
+        <li>Dynamic scopes: <span class="status-chip EARLY_ACCESS">EARLY ACCESS</span></li>
+        <li>Partner-Initiated OAuth: <span class="status-chip RESTRICTED">RESTRICTED</span> invitation-only · PKCE S256</li>
+        <li>One-way account linking: AVAILABLE · browser-based · HMAC nonce</li>
+        <li>Official Partner SDK: <span class="status-chip UNAVAILABLE">UNAVAILABLE</span> — use standard HTTP libraries</li>
+        <li>Token scopes documented: ${(DATA.oauth_token_scope_strings||[]).map(s=>`<code>${esc(s.string)}</code>`).join(', ')}</li>
+        <li>Transport: server-to-server only · browser CORS blocked · 100 TPS / client_id</li>
+        <li>Runtime link status: <span class="truth unavail">RING SOURCE FACT (runtime) — UNAVAILABLE</span></li>
+      </ul>
+    `;
+  }
+
+  function initEndpoints(){
+    const cats = [...new Set(DATA.endpoints.map(e => e.category))].sort();
+    cats.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; $('#ep-cat').appendChild(o); });
+    const render = () => {
+      const q = $('#ep-q').value.trim().toLowerCase();
+      const cat = $('#ep-cat').value;
+      const list = DATA.endpoints.filter(e => {
+        if (cat && e.category !== cat) return false;
+        if (q) {
+          const hay = [e.id,e.method,e.path,e.url,e.purpose,e.category].join(' ').toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+      const wh = DATA.webhooks;
+      $('#ep-list').innerHTML = `
+        <div class="help" style="margin-bottom:10px">Base: <code>${esc(DATA.bases.amazon_vision_api)}</code> · OAuth: <code>${esc(DATA.bases.oauth)}</code> · S2S only · ${esc(DATA.transport_rules.rate_limit_tps_per_partner_client_id)} TPS</div>
+        ${list.map(e => `
+          <div style="border-bottom:1px solid rgba(0,255,135,.08);padding:10px 0;cursor:pointer" data-epid="${esc(e.id)}">
+            <div><span class="tag">${esc(e.method||'')}</span> <code>${esc(e.path||e.url||'')}</code>
+              <span class="status-chip ${esc(e.availability)}">${esc(e.availability)}</span></div>
+            <div class="help">${esc(e.purpose)} · ${esc(e.category)} · verified ${esc(e.last_verified)}</div>
+          </div>
+        `).join('')}
+        <h3 class="display" style="color:var(--c);margin:16px 0 8px">Documented webhooks (${wh.events.length})</h3>
+        <div class="help">Transport ${esc(wh.transport)} · ${esc(wh.signature_header)} ${esc(wh.signature_alg)} · SLA ${wh.response_sla_seconds}s</div>
+        <div class="taglist" style="margin-top:8px">${wh.events.map(w=>`<span class="tag">${esc(w.type)} · ${esc(w.availability)}</span>`).join('')}</div>
+        <h3 class="display" style="color:var(--p);margin:16px 0 8px">Explicitly unavailable</h3>
+        <ul class="tight">${(wh.explicitly_unavailable||[]).map(u=>`<li><code>${esc(u.type)}</code> — ${esc(u.notes)}</li>`).join('')}</ul>
+      `;
+      $$('#ep-list [data-epid]').forEach(el => el.addEventListener('click', () => {
+        const ep = DATA.endpoints.find(x => x.id === el.dataset.epid);
+        showModal(ep.id, ep);
+      }));
+    };
+    $('#ep-q').addEventListener('input', render);
+    $('#ep-cat').addEventListener('change', render);
+    render();
+  }
+
+  function initKernel(){
+    const ta = $('#kern-src');
+    ta.value = DEFAULT_KERNEL;
+    compileKernel(DEFAULT_KERNEL);
+    function load(){
+      try {
+        compileKernel(ta.value);
+        $('#kern-err').textContent = '';
+        $('#kern-status').textContent = 'kernel live · ' + new Date().toLocaleTimeString();
+      } catch (err) {
+        $('#kern-err').textContent = String(err.message || err);
+        $('#kern-status').textContent = 'compile failed — previous kernel still armed';
+      }
+    }
+    $('#kern-reload').addEventListener('click', load);
+    $('#kern-reset').addEventListener('click', () => { ta.value = DEFAULT_KERNEL; load(); });
+  }
+
+  function exportPayload(){
+    const payload = {
+      module: 'RINGFORGE // NEXUS',
+      version: DATA.version,
+      operator: 'DoubleA @ AntManThePro',
+      exported_at: new Date().toISOString(),
+      truth: {
+        partner_oauth: 'NOT LINKED',
+        runtime_source_facts: 'UNAVAILABLE',
+        event_bus: 'MOCK ADAPTER',
+        correlator: 'RINGFORGE DERIVED'
+      },
+      kernel: $('#kern-src')?.value || DEFAULT_KERNEL,
+      source_gate: { state: SOURCE.state, mode: SOURCE.mode, http: SOURCE.http, device_count: SOURCE.devices.length, token_exported: false },
+      open_incidents: incidents.filter(i => !i.closed).slice(0,20),
+      recent_events: events.slice(0,20),
+      matrix_row_count: allMatrixRows().length,
+      conflicts: DATA.conflicts,
+      open_verification_items: DATA.open_verification_items
+    };
+    const text = JSON.stringify(payload, null, 2);
+    showModal('EXPORT PAYLOAD', payload);
+    try {
+      navigator.clipboard.writeText(text);
+    } catch {}
+  }
+  $('#btn-export').addEventListener('click', exportPayload);
+
+  function initHire(){
+    const rows = allMatrixRows();
+    const by = s => rows.filter(r => r.availability === s).length;
+    const avail = by('AVAILABLE'), early = by('EARLY_ACCESS'), rest = by('RESTRICTED'), unavail = by('UNAVAILABLE');
+    const openOV = DATA.open_verification_items.filter(o => o.status==='OPEN').length;
+    const wh = DATA.webhooks.events.length;
+    $('#hire').innerHTML = `
+      <div class="hero card">
+        <p class="quote">“Never sacrifice truth for features.”</p>
+        <p>RINGFORGE is the intelligence layer on verified Ring Developer contracts — not a fantasy home dashboard. The bus is labeled MOCK. Partner OAuth is NOT LINKED. Runtime source facts stay UNAVAILABLE. The kernel is live JS you can rewrite.</p>
+        <div class="credit">${esc(DATA.credit)} · Module ${esc(DATA.version)} · Matrix ${esc(DATA.boot.matrix_version)} · Verified ${esc(DATA.boot.last_verified)} CT</div>
+      </div>
+      <div class="stat"><div class="n">${rows.length}</div><div class="l">VERIFIED CAPABILITY ROWS</div></div>
+      <div class="stat"><div class="n">${avail}</div><div class="l">AVAILABLE</div></div>
+      <div class="stat"><div class="n">${early}</div><div class="l">EARLY ACCESS</div></div>
+      <div class="stat"><div class="n">${unavail}</div><div class="l">UNAVAILABLE</div></div>
+      <div class="stat"><div class="n">${DATA.device_families.length}</div><div class="l">DEVICE FAMILIES</div></div>
+      <div class="stat"><div class="n">${DATA.endpoints.length}</div><div class="l">ENDPOINTS</div></div>
+      <div class="stat"><div class="n">${wh}</div><div class="l">DOCUMENTED WEBHOOK TYPES</div></div>
+      <div class="stat"><div class="n">${openOV + DATA.conflicts.length}</div><div class="l">OPEN CONFLICTS / OV ITEMS</div></div>
+      <div class="card" style="grid-column:1/-1">
+        <h3 class="display" style="color:var(--y);margin:0 0 8px">Open conflicts & verification</h3>
+        <ul class="tight">
+          ${(DATA.open_verification_items||[]).map(o=>`<li><b>${esc(o.id)}</b> ${esc(o.item)} — <span class="status-chip ${o.status==='OPEN'?'RESTRICTED':'AVAILABLE'}">${esc(o.status)}</span> · ${esc(o.blocker||'')}</li>`).join('')}
+        </ul>
+        <h3 class="display" style="color:var(--c);margin:14px 0 8px">Truth labels</h3>
+        <div class="taglist">
+          <span class="truth fact">RING DOCUMENTATION FACT</span>
+          <span class="truth unavail">RING SOURCE FACT (runtime) — UNAVAILABLE</span>
+          <span class="truth derived">RINGFORGE DERIVED</span>
+          <span class="truth mock">MOCK ADAPTER</span>
+        </div>
+        <p class="help" style="margin-top:12px">Keys: <code>/</code> search · <code>1-8</code> panels · <code>Space</code> pause · <code>E</code> export · <code>Esc</code> close · Add to Home Screen for the sigil.</p>
+        <p class="help">RESTRICTED platform rows: ${rest}</p>
+      </div>
+    `;
+  }
+
+  function safe(name, fn){
+    try { fn(); }
+    catch (err) { console.error('RINGFORGE init failed:', name, err); }
+  }
+
+  const SOURCE = {
+    state: 'UNLINKED',
+    mode: 'MOCK',
+    http: null,
+    last: null,
+    devices: [],
+    raw: null,
+    log: []
+  };
+
+  function gateChip() {
+    const map = {
+      UNLINKED: ['unavail', 'RING SOURCE FACT (runtime) — UNAVAILABLE'],
+      TOKEN_HELD: ['derived', 'TOKEN HELD · UNVERIFIED'],
+      TRANSPORT_BLOCKED: ['unavail', 'TRANSPORT FACT · BROWSER CORS BLOCKED'],
+      AUTH_FAILED: ['mock', 'SOURCE REJECTED · AUTH FAILED'],
+      SIDECAR_DOWN: ['mock', 'SIDECAR UNREACHABLE'],
+      LINKED: ['fact', 'RING SOURCE FACT (runtime) — LINKED']
+    };
+    const pair = map[SOURCE.state] || map.UNLINKED;
+    const el = $('#gate-truth');
+    if (el) { el.className = 'truth ' + pair[0]; el.textContent = pair[1]; }
+    const hdr = $('#src-chip');
+    if (hdr) {
+      hdr.className = 'chip ' + (SOURCE.state === 'LINKED' ? 'ok live' : SOURCE.state === 'UNLINKED' ? 'bad' : 'warn');
+      hdr.textContent = SOURCE.state === 'LINKED' ? 'RUNTIME SOURCE FACTS: LINKED' : 'RUNTIME SOURCE FACTS: ' + SOURCE.state.replace(/_/g,' ');
+    }
+  }
+
+  function gateLog(line, cls) {
+    SOURCE.log.unshift({ t: Date.now(), line, cls });
+    if (SOURCE.log.length > 40) SOURCE.log.length = 40;
+    const box = $('#gate-log');
+    if (!box) return;
+    box.innerHTML = SOURCE.log.map(e =>
+      `<div class="evt"><div class="type">${esc(e.line)}</div><div class="meta">${new Date(e.t).toLocaleTimeString()} · ${esc(e.cls || '')}</div></div>`
+    ).join('');
+  }
+
+  function renderGate() {
+    gateChip();
+    const ml = $('#gate-mode-label');
+    if (ml) ml.textContent = SOURCE.mode + ' · ' + SOURCE.state;
+    const last = $('#gate-last');
+    if (last) last.textContent = SOURCE.last ? new Date(SOURCE.last).toLocaleTimeString() : 'never';
+    const http = $('#gate-http');
+    if (http) http.textContent = SOURCE.http == null ? '—' : String(SOURCE.http);
+    const dc = $('#gate-devcount');
+    if (dc) dc.textContent = SOURCE.devices.length ? (SOURCE.devices.length + ' source records') : '0 · source empty';
+    const chips = $('#gate-chips');
+    if (chips) {
+      chips.innerHTML = `
+        <span class="truth ${SOURCE.state==='LINKED'?'fact':'unavail'}">${esc(SOURCE.state)}</span>
+        <span class="truth ${SOURCE.mode==='MOCK'?'mock':SOURCE.mode==='DIRECT'?'ai':'derived'}">${esc(SOURCE.mode)}</span>
+        <span class="truth fact">S2S ONLY IN DOCS</span>
+        <span class="truth mock">TOKEN NEVER IN EXPORT</span>`;
+    }
+    const inv = $('#gate-inv');
+    if (inv) {
+      if (!SOURCE.devices.length) {
+        inv.className = 'empty';
+        inv.textContent = SOURCE.state === 'LINKED' ? 'LINKED but payload had no data[]' : 'NO SOURCE FACTS';
+      } else {
+        inv.className = '';
+        inv.innerHTML = SOURCE.devices.map(d => {
+          const id = d.id || d.attributes?.id || '—';
+          const kind = inferFamily(d);
+          return `<div class="gate-row"><div><code>${esc(id)}</code><div class="help">${esc(kind)} · ${esc(d.type || 'resource')}</div></div>
+            <span class="truth fact">SOURCE FACT</span></div>`;
+        }).join('');
+      }
+    }
+  }
+
+  function inferFamily(d) {
+    const caps = d.attributes?.capabilities || d.capabilities || {};
+    const audio = caps.audio || {};
+    const actions = audio.supported_actions || [];
+    if (Array.isArray(actions) && actions.includes('chime.play') && !caps.video && !caps.motion_detection) {
+      return 'family:chime (rule: audio.supported_actions contains chime.play)';
+    }
+    return 'family:untyped — do not infer from capability keys alone (P3 rule)';
+  }
+
+  function parseDevicePayload(json) {
+    if (!json) return [];
+    if (Array.isArray(json.data)) return json.data;
+    if (json.data && typeof json.data === 'object') return [json.data];
+    if (Array.isArray(json)) return json;
+    return [];
+  }
+
+  async function probeSource(kind) {
+    const mode = $('#gate-mode')?.value || 'MOCK';
+    SOURCE.mode = mode;
+    const token = ($('#gate-token')?.value || '').trim();
+    const base = ($('#gate-sidecar')?.value || 'http://127.0.0.1:8787').replace(/\/$/, '');
+    if ($('#gate-persist')?.checked && token) {
+      try { sessionStorage.setItem('rf.token', token); sessionStorage.setItem('rf.sidecar', base); } catch {}
+    }
+    if (token && SOURCE.state === 'UNLINKED') SOURCE.state = 'TOKEN_HELD';
+
+    if (mode === 'MOCK' && kind !== 'health') {
+      SOURCE.state = 'UNLINKED';
+      SOURCE.devices = [];
+      SOURCE.http = null;
+      SOURCE.last = Date.now();
+      gateLog('MOCK mode — will not claim source facts', 'MOCK ADAPTER');
+      renderGate();
+      return;
+    }
+
+    const headers = { 'Accept': 'application/vnd.api+json, application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    let url;
+    if (kind === 'health') url = base + '/health';
+    else if (mode === 'DIRECT') url = 'https://api.amazonvision.com/v1/devices?include=status,capabilities';
+    else url = base + '/v1/devices?include=status,capabilities';
+
+    gateLog((kind === 'health' ? 'GET health ' : 'GET devices ') + url, mode);
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const res = await fetch(url, { method: 'GET', headers, signal: ctrl.signal, mode: 'cors' });
+      clearTimeout(to);
+      SOURCE.http = res.status;
+      SOURCE.last = Date.now();
+      const text = await res.text();
+      let json = null;
+      try { json = JSON.parse(text); } catch { json = { raw: text.slice(0, 400) }; }
+      SOURCE.raw = json;
+      if (kind === 'health') {
+        if (res.ok) {
+          gateLog('sidecar health OK · ' + (json.module || 'up'), 'SIDECAR PROCESS FACT');
+        } else {
+          SOURCE.state = 'SIDECAR_DOWN';
+          gateLog('sidecar health HTTP ' + res.status, 'SIDECAR PROCESS FACT');
+        }
+        renderGate();
+        return;
+      }
+      if (res.status === 401 || res.status === 403) {
+        SOURCE.state = 'AUTH_FAILED';
+        SOURCE.devices = [];
+        gateLog('upstream/auth rejected HTTP ' + res.status, 'SOURCE FACT');
+      } else if (res.ok) {
+        SOURCE.devices = parseDevicePayload(json);
+        SOURCE.state = 'LINKED';
+        gateLog('linked · ' + SOURCE.devices.length + ' records in data[]', 'RING SOURCE FACT');
+      } else {
+        SOURCE.state = 'AUTH_FAILED';
+        SOURCE.devices = [];
+        gateLog('HTTP ' + res.status + ' · not treated as inventory', 'SOURCE FACT');
+      }
+    } catch (err) {
+      clearTimeout(to);
+      SOURCE.last = Date.now();
+      SOURCE.devices = [];
+      const msg = String(err && err.message || err);
+      const blocked = /fail|network|cors|fetch|abort/i.test(msg);
+      if (mode === 'DIRECT') {
+        SOURCE.state = 'TRANSPORT_BLOCKED';
+        SOURCE.http = 0;
+        gateLog('DIRECT failed · ' + msg + ' · labeled TRANSPORT FACT (docs: browser CORS blocked)', 'TRANSPORT FACT');
+      } else {
+        SOURCE.state = 'SIDECAR_DOWN';
+        SOURCE.http = 0;
+        gateLog('SIDECAR failed · ' + msg + ' · start sidecar.py on 127.0.0.1:8787', 'SIDECAR PROCESS FACT');
+      }
+    }
+    renderGate();
+  }
+
+  function clearLink() {
+    SOURCE.state = 'UNLINKED';
+    SOURCE.mode = $('#gate-mode')?.value || 'MOCK';
+    SOURCE.http = null;
+    SOURCE.devices = [];
+    SOURCE.raw = null;
+    const tok = $('#gate-token');
+    if (tok) tok.value = '';
+    try { sessionStorage.removeItem('rf.token'); } catch {}
+    gateLog('link cleared · token dropped from session', 'GATE');
+    renderGate();
+  }
+
+  function initGate() {
+    try {
+      const t = sessionStorage.getItem('rf.token');
+      const s = sessionStorage.getItem('rf.sidecar');
+      if (t && $('#gate-token')) { $('#gate-token').value = t; $('#gate-persist').checked = true; SOURCE.state = 'TOKEN_HELD'; }
+      if (s && $('#gate-sidecar')) $('#gate-sidecar').value = s;
+    } catch {}
+    $('#gate-mode')?.addEventListener('change', () => { SOURCE.mode = $('#gate-mode').value; renderGate(); });
+    $('#gate-probe')?.addEventListener('click', () => probeSource('devices'));
+    $('#gate-health')?.addEventListener('click', () => probeSource('health'));
+    $('#gate-clear')?.addEventListener('click', clearLink);
+    $('#pkce-gen')?.addEventListener('click', generatePkce);
+    $('#hmac-run')?.addEventListener('click', runHmac);
+    renderGate();
+  }
+
+  function b64url(bytes) {
+    let bin = '';
+    bytes.forEach(b => bin += String.fromCharCode(b));
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  async function generatePkce() {
+    const raw = crypto.getRandomValues(new Uint8Array(32));
+    const verifier = b64url(raw);
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+    const challenge = b64url(new Uint8Array(digest));
+    const out = {
+      truth: 'RINGFORGE DERIVED · values generated locally, not sent',
+      method: 'S256',
+      code_verifier: verifier,
+      code_challenge: challenge,
+      code_challenge_method: 'S256',
+      documented_authorize: 'https://account.ring.com/account/integrations/partner-link/authorize',
+      documented_token: 'https://oauth.ring.com/oauth/token',
+      documented_scope: 'ava.v1:read',
+      note: 'Partner-initiated OAuth is RESTRICTED / invitation-only. This lab does not perform the redirect.'
+    };
+    $('#pkce-out').textContent = JSON.stringify(out, null, 2);
+  }
+
+  async function runHmac() {
+    const secret = $('#hmac-secret')?.value || '';
+    const body = $('#hmac-body')?.value || '';
+    const given = ($('#hmac-sig')?.value || '').trim();
+    if (!secret) { $('#hmac-status').textContent = 'need secret'; return; }
+    const key = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
+    const hex = [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('');
+    const header = 'sha256=' + hex;
+    const normalize = s => s.toLowerCase().replace(/^sha256=/, '');
+    const match = given ? normalize(given) === hex : null;
+    $('#hmac-sig').value = header;
+    $('#hmac-status').textContent = given ? (match ? 'MATCH' : 'MISMATCH') : 'SIGNED';
+    $('#hmac-out').textContent = JSON.stringify({
+      truth: 'RINGFORGE DERIVED · computed in-browser with WebCrypto',
+      documented: 'X-Signature HMAC-SHA256 hex with sha256= prefix',
+      computed: header,
+      provided: given || null,
+      match,
+      body_bytes: new TextEncoder().encode(body).length
+    }, null, 2);
+  }
+
+
+  function initAll(){
+    safe('topo', initTopo);
+    safe('matrix', initMatrix);
+    safe('scopes', initScopes);
+    safe('endpoints', initEndpoints);
+    safe('kernel', initKernel);
+    safe('hire', initHire);
+    safe('radar', initRadar);
+    safe('bus', renderBus);
+    safe('gate', initGate);
+    setInterval(emitEvent, 1400);
+    for (let i=0;i<5;i++) setTimeout(emitEvent, 200*i);
+  }
+})();
+</script>
+</body>
+</html>
