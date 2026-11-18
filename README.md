@@ -1,9 +1,20 @@
 # RINGFORGE // NEXUS v3
 
-Mission-control HUD that showcases RINGFORGE as the **truth layer** on top
-of verified Ring Developer capabilities. It embeds contract facts only —
-Capability Matrix v1, Scope / Endpoint / Device registries v1 — and never
-invents Ring APIs.
+Mission-control HUD that shows RINGFORGE as the **truth layer** on top of verified Ring Developer capabilities. MOCK by default — zero network calls until you say otherwise.
+
+**Live:** https://ringforge.netlify.app/
+
+## How to use
+
+1. Open the live site. It boots into MOCK mode — live-looking telemetry is explicitly mock.
+2. Use the dock to switch panels (`1`–`6`), `/` to search, `Space` to pause the event bus, `Esc` to close.
+3. Want real data? The Source Gate panel can probe a local sidecar or, in DIRECT mode with a token you paste in, the Ring Partner API. Nothing is fetched unless you switch modes and provide a token.
+
+## Links
+
+- Live site: https://ringforge.netlify.app/
+- NEXUS Hub: https://nexus-world-hub.netlify.app/
+- Repo: https://github.com/AntManThePro/ringforge
 
 ## Truth model (shown in the app)
 

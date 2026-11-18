@@ -15,6 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icons/favicon-192.png"/>
 <link rel="icon" type="image/png" sizes="512x512" href="icons/favicon-512.png"/>
 <link rel="apple-touch-icon" href="icons/nexus-ringforge-180.png"/>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -163,6 +164,9 @@ code{color:var(--c)}
 .gate-row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid rgba(0,255,135,.08);font-size:11px}
 .kernel .chip.live{border-color:rgba(0,255,135,.7);color:var(--g);box-shadow:0 0 10px rgba(0,255,135,.15)}
 
+#antEgg{position:fixed;right:14px;bottom:calc(var(--status,52px) + 10px);z-index:95;max-width:320px;background:#0d1110;border:1px solid var(--g);border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.5;color:var(--ink);box-shadow:0 6px 24px rgba(0,0,0,.6);display:none}
+#antEgg.on{display:block}
+#antEgg small{display:block;margin-top:6px;color:var(--muted);font-size:9.5px}
 </style>
 </head>
 <body>
@@ -1612,7 +1616,23 @@ function scoreIncident(ev, last, familyDist, dtMs, WINDOW_MS) {
     setInterval(emitEvent, 1400);
     for (let i=0;i<5;i++) setTimeout(emitEvent, 200*i);
   }
+  // EASTER EGG: type A-N-T (not in an input) and AntMan pops in. Harmless toast, no data touched.
+  let eggKeys = '';
+  window.addEventListener('keydown', e => {
+    if (!booted) return;
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (!e.key || e.key.length !== 1) return;
+    eggKeys = (eggKeys + e.key.toLowerCase()).slice(-3);
+    if (eggKeys === 'ant') {
+      eggKeys = '';
+      const el = document.getElementById('antEgg');
+      if (el) { el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 6000); }
+    }
+  });
+
 })();
 </script>
+<div id="antEgg" role="status">🐜 AntMan was here. The ring is real, the telemetry is mock, the hustle is not.<small>Fine print: you typed A-N-T on purpose and found the one honest panel in the building. No data was harmed, no Ring API was called, and DoubleA still says it himself — not perfect, just real.</small></div>
 </body>
 </html>
